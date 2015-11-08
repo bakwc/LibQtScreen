@@ -12,9 +12,8 @@ enum ECommand {
 struct TInjectedAppInfo {
     uint32_t PID;
     std::string Name;
-    bool HasDirectX;
 
-    SAVELOAD(PID, Name, HasDirectX)
+    SAVELOAD(PID, Name)
 };
 
 struct TInjectorHelpInfo {

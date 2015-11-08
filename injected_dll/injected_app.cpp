@@ -6,9 +6,9 @@
 #include <QDebug>
 #include <sstream>
 #include <QBuffer>
+#include <QCoreApplication>
 
-TInjectedApp::TInjectedApp(int& argc, char **argv)
-    : QCoreApplication(argc, argv)
+TInjectedApp::TInjectedApp()
 {
     connect(&Sock, &QLocalSocket::readyRead, [this] {
         Buffer += Sock.readAll();
@@ -21,9 +21,8 @@ TInjectedApp::TInjectedApp(int& argc, char **argv)
             this, &TInjectedApp::onScreenshotReady,
             Qt::BlockingQueuedConnection);
 
-    Info.PID = applicationPid();
-    Info.Name = applicationFilePath().toStdString();
-    Info.HasDirectX = false;
+    Info.PID = QCoreApplication::instance()->applicationPid();
+    Info.Name = QCoreApplication::instance()->applicationFilePath().toStdString();
 
     Sock.connectToServer("mothership");
 }

@@ -1,15 +1,15 @@
 #pragma once
 
 #include <libdxscreen/proto.h>
-#include <QCoreApplication>
+#include <QObject>
 #include <QLocalSocket>
 #include <QImage>
 #include <windows.h>
 
-class TInjectedApp : public QCoreApplication {
+class TInjectedApp : public QObject {
     Q_OBJECT
 public:
-    TInjectedApp(int& argc, char** argv);
+    TInjectedApp();
 signals:
     void onScreenshotReadySignal(QImage img);
 private slots:

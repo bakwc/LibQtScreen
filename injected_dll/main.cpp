@@ -2,13 +2,24 @@
 #include <thread>
 #include <iostream>
 
+#include <QEventLoop>
+#include <QCoreApplication>
+
 #include "injected_app.h"
 
 void MainLoop() {
-    int argc = 0;
-    char **argv = nullptr;
-    TInjectedApp app(argc, argv);
-    app.exec();
+    // Check if this is a Qt application
+    if (QCoreApplication::instance()) {
+        QEventLoop loop;
+        TInjectedApp myApp;
+        loop.exec();
+    } else {
+        int argc = 0;
+        char** argv = nullptr;
+        QCoreApplication loop(argc, argv);
+        TInjectedApp myApp;
+        loop.exec();
+    }
 }
 
 extern "C"
