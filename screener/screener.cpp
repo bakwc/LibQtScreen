@@ -30,7 +30,7 @@ void TClient::timerEvent(QTimerEvent *) {
     Send(CMD_Ping, "ping");
     static int n = 0;
     n += 1;
-    if (n == 3) {
+    if (n == 5) {
         qDebug() << "requesting screenshot";
         Send(CMD_ScreenShot, "doit");
     }
@@ -40,14 +40,14 @@ bool TClient::ProcessBuffer() {
     if (Buffer.size() < 2) {
         return false;
     }
-    uint16_t packetSize = *(uint16_t*)Buffer.data();
+    uint32_t packetSize = *(uint32_t*)Buffer.data();
     // todo: check packet size
-    if (Buffer.size() < packetSize + 2) {
+    if (Buffer.size() < packetSize + 6) {
         return false;
     }
-    uint16_t packetType = *(uint16_t*)(Buffer.data() + 2);
-    QByteArray packetData = QByteArray(Buffer.data() + 4, packetSize - 2);
-    Buffer.remove(0, packetSize + 2);
+    uint16_t packetType = *(uint16_t*)(Buffer.data() + 4);
+    QByteArray packetData = QByteArray(Buffer.data() + 6, packetSize);
+    Buffer.remove(0, packetSize + 6);
     OnPacketReceived((ECommand)packetType, packetData);
     return true;
 }
@@ -66,18 +66,17 @@ void TClient::OnPacketReceived(ECommand cmd, const QByteArray& data) {
         QBuffer buffer(&nonConstData);
         buffer.open(QIODevice::ReadOnly);
         img.load(&buffer, "png");
-        qDebug() << "screenshot received";
-        //img.save("C:\\koding\\screener_dump.png");
+        img.save("C:\\koding\\screener_dump.png");
     } break;
     }
 }
 
 void TClient::Send(ECommand cmd, const QByteArray& data) {
     QByteArray packet;
-    packet.resize(4);
+    packet.resize(6);
     packet += data;
-    *(uint16_t*)(packet.data() + 2) = (uint16_t)cmd;
-    *(uint16_t*)(packet.data()) = (uint16_t)(data.size() + 2);
+    *(uint32_t*)(packet.data()) = (uint32_t)(data.size());
+    *(uint16_t*)(packet.data() + 4) = (uint16_t)cmd;
     Sock->write(packet);
 }
 
@@ -88,11 +87,13 @@ TScreener::TScreener(int &argc, char **argv)
     connect(&Server, &QLocalServer::newConnection, [this] {
         Connections.emplace_back(new TClient(this, Server.nextPendingConnection()));
     });
+    startTimer(1000);
     Server.listen("mothership");
 }
 
 bool TScreener::Inject() {
-    int pid = GetProcessID(L"dxtest_dx8.exe");
+    //int pid = GetProcessID(L"dxtest_dx8.exe");
+    int pid = GetProcessID(L"BF1942.exe");
     if (!pid) {
         qDebug() << "inject process not found";
         return false;
@@ -106,4 +107,12 @@ bool TScreener::Inject() {
 
     qDebug() << "injected";
     return true;
+}
+
+void TScreener::timerEvent(QTimerEvent *) {
+    static int n = 0;
+    n += 1;
+    if (n == 10) {
+        Inject();
+    }
 }

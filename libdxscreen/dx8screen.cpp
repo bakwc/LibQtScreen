@@ -4,6 +4,7 @@
 
 #include <d3d8.h>
 
+
 struct THookCtx {
     void* PresentFun = nullptr;
     TScreenCallback Callback;
@@ -44,6 +45,8 @@ void GetDX8Screenshot(IDirect3DDevice8* device) {
     if (FAILED(hr)) {
         return;
     }
+
+
 
     QImage screenShotImg = IntArrayToQImage((char*)rect.pBits, desc.Height, desc.Width);
     HookCtx.Callback(screenShotImg);

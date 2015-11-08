@@ -34,6 +34,8 @@ public:
     TScreener(int &argc, char **argv);
     bool Inject();
 private:
+    void timerEvent(QTimerEvent*);
+private:
     QLocalServer Server;
     std::vector<TClientRef> Connections;
     TInjectorHelpInfo InjectorHelpInfo;

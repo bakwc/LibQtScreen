@@ -37,17 +37,17 @@ void TInjectedApp::onScreenshotReady(QImage img) {
 }
 
 bool TInjectedApp::ProcessBuffer() {
-    if (Buffer.size() < 2) {
+    if (Buffer.size() < 4) {
         return false;
     }
-    uint16_t packetSize = *(uint16_t*)Buffer.data();
+    uint32_t packetSize = *(uint32_t*)Buffer.data();
     // todo: check packet size
-    if (Buffer.size() < packetSize + 2) {
+    if (Buffer.size() < packetSize + 6) {
         return false;
     }
-    uint16_t packetType = *(uint16_t*)(Buffer.data() + 2);
-    QByteArray packetData = QByteArray(Buffer.data() + 4, packetSize - 2);
-    Buffer.remove(0, packetSize + 2);
+    uint16_t packetType = *(uint16_t*)(Buffer.data() + 4);
+    QByteArray packetData = QByteArray(Buffer.data() + 6, packetSize);
+    Buffer.remove(0, packetSize + 6);
     OnPacketReceived((ECommand)packetType, packetData);
     return true;
 }
@@ -74,11 +74,11 @@ void TInjectedApp::OnPacketReceived(ECommand cmd, const QByteArray& data) {
 
 void TInjectedApp::Send(ECommand cmd, const QByteArray& data) {
     QByteArray packet;
-    packet.resize(4);
+    packet.resize(6);
     packet += data;
-    *(uint16_t*)(packet.data() + 2) = (uint16_t)cmd;
-    *(uint16_t*)(packet.data()) = (uint16_t)(data.size() + 2);
-    Sock.write(packet);
+    *(uint32_t*)(packet.data()) = (uint32_t)(data.size());
+    *(uint16_t*)(packet.data() + 4) = (uint16_t)cmd;
+    qint64 res = Sock.write(packet);
 }
 
 void TInjectedApp::MakeScreenshot() {

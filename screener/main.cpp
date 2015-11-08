@@ -10,6 +10,5 @@
 
 int main(int argc, char **argv) {
     TScreener screener(argc, argv);
-    screener.Inject();
     return screener.exec();
 }
