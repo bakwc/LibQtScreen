@@ -22,6 +22,7 @@ SOURCES += inject.cpp \
     saveload.cpp \
     dummy_window.cpp \
     dx8offsets.cpp \
+    dx9offsets.cpp \
     dxscreen.cpp \
     dx8screen.cpp \
     screen.cpp \

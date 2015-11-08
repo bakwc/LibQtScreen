@@ -8,3 +8,4 @@ inline uint64_t GetVtableOffset(uint64_t module, void* cls, uint32_t offset) {
 }
 
 void GetDX8Offsets(uint64_t& present);
+void GetDX9Offsets(uint64_t& present, uint64_t& presentEx);

@@ -18,6 +18,8 @@ struct TInjectedAppInfo {
 
 struct TInjectorHelpInfo {
     uint64_t DX8PresentOffset;
+    uint64_t DX9PresentOffset;
+    uint64_t DX9PresentExOffset;
 
-    SAVELOAD(DX8PresentOffset)
+    SAVELOAD(DX8PresentOffset, DX9PresentOffset, DX9PresentExOffset)
 };

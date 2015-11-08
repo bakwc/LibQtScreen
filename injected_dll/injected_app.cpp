@@ -77,7 +77,7 @@ void TInjectedApp::Send(ECommand cmd, const QByteArray& data) {
     packet += data;
     *(uint32_t*)(packet.data()) = (uint32_t)(data.size());
     *(uint16_t*)(packet.data() + 4) = (uint16_t)cmd;
-    qint64 res = Sock.write(packet);
+    Sock.write(packet);
 }
 
 void TInjectedApp::MakeScreenshot() {
