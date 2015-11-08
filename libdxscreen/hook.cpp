@@ -10,6 +10,9 @@ static std::map<uint64_t, std::string> OldData;
 void DoHook(void *func, void *handler) {
     uint8_t* origFunc = (uint8_t*)func;
     uint8_t* newFunc = (uint8_t*)handler;
+    if (OldData.find((uint64_t)origFunc) != OldData.end()) {
+        return;
+    }
     DWORD t;
     VirtualProtect(origFunc, 5, PAGE_EXECUTE_READWRITE, &t);
     uint32_t distance = newFunc - origFunc - 5;
@@ -23,6 +26,9 @@ void DoHook(void *func, void *handler) {
 
 void DoUnHook(void *func) {
     uint8_t* origFunc = (uint8_t*)func;
+    if (OldData.find((uint64_t)origFunc) == OldData.end()) {
+        return;
+    }
     std::string oldData = OldData[(uint64_t)origFunc];
     memcpy(origFunc, &oldData[0], 5);
     OldData.erase((uint64_t)origFunc);

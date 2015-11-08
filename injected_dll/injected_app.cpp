@@ -84,4 +84,7 @@ void TInjectedApp::MakeScreenshot() {
     MakeDX8Screen([this](const QImage& img) {
         emit onScreenshotReadySignal(img);
     }, HelpInfo.DX8PresentOffset);
+    MakeDX9Screen([this](const QImage& img) {
+        emit onScreenshotReadySignal(img);
+    }, HelpInfo.DX9PresentOffset, HelpInfo.DX9PresentExOffset);
 }

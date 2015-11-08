@@ -5,6 +5,7 @@
 #include <windows.h>
 #include <iostream>
 
+#include <QDebug>
 
 typedef IDirect3D9 *(WINAPI *DX9CreateFunc)(UINT);
 
@@ -22,7 +23,7 @@ static inline bool InitDX9(HMODULE& module, LPDIRECT3DDEVICE9& device) {
         return false;
     }
 
-    module = LoadLibraryA("d3d8.dll");
+    module = LoadLibraryA("d3d9.dll");
     if (!module) {
         return false;
     }

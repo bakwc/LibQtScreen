@@ -1,5 +1,4 @@
 #include "dxscreen.h"
-
 #include "hook.h"
 
 #include <d3d8.h>
@@ -60,7 +59,7 @@ static HRESULT STDMETHODCALLTYPE HookPresent(IDirect3DDevice8* device,
 {
     UnHook(HookCtx.PresentFun);
     GetDX8Screenshot(device);
-    device->Present(srcRect, dstRect, overrideWindow, dirtyRegion);
+    return device->Present(srcRect, dstRect, overrideWindow, dirtyRegion);
 }
 
 void MakeDX8Screen(const TScreenCallback& callback, uint64_t presentOffset) {

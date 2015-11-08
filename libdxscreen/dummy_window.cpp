@@ -22,5 +22,7 @@ bool RegisterDummyWindow() {
         return false;
     }
 
+    registered = true;
+
     return true;
 }

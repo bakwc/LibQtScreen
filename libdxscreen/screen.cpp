@@ -36,6 +36,25 @@ void TScreenShotMaker::timerEvent(QTimerEvent*) {
 }
 
 void TScreenShotMaker::InjectAll() {
+
+    /// For testing purpose - to inject to signle process only.
+    /*
+    int pid = GetProcessID(L"dxtest_dx9.exe");
+    if (!pid) {
+        return;
+    }
+    static bool inj = false;
+    if (inj) {
+        return;
+    }
+    if (!InjectDll(pid, INJECTED_DLL)) {
+        return;
+    }
+    inj = true;
+    qDebug() << "injected";
+    return;
+    */
+
     DWORD procList[1024];
     DWORD cbNeeded;
     EnumProcesses(procList, sizeof(procList), &cbNeeded);
