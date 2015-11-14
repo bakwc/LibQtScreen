@@ -40,7 +40,6 @@ void TScreenShotMaker::timerEvent(QTimerEvent*) {
 }
 
 void TScreenShotMaker::InjectAll() {
-return;
     /// For testing purpose - to inject to signle process only.
     /*
     int pid = GetProcessID(L"dxtest_dx9.exe");
