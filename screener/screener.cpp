@@ -1,15 +1,22 @@
 #include "screener.h"
 
+#include <libdxscreen/screen.h>
+
 #include <QImage>
+
 
 TScreener::TScreener(int &argc, char **argv)
     : QCoreApplication(argc, argv)
 {
+    Screener.reset(new TScreenShotMaker());
     startTimer(1000);
-    connect(&Screener, &TScreenShotMaker::OnScreenshotReady, [this] {
-        QImage screenShot = Screener.GetLastScreenshot();
+    connect(Screener.get(), &TScreenShotMaker::OnScreenshotReady, [this] {
+        QImage screenShot = Screener->GetLastScreenshot();
         qDebug() << "screenshot created" << screenShot.width();
     });
+}
+
+TScreener::~TScreener() {
 }
 
 void TScreener::timerEvent(QTimerEvent *) {
@@ -17,6 +24,6 @@ void TScreener::timerEvent(QTimerEvent *) {
     n += 1;
     if (n == 10) {
         qDebug() << "making screenshot";
-        Screener.MakeScreenshot();
+        Screener->MakeScreenshot();
     }
 }

@@ -3,60 +3,70 @@
 
 #include <d3d8.h>
 #include <windows.h>
-#include <iostream>
-
 
 typedef IDirect3D8 *(WINAPI *DX8CreateFunc)(UINT);
 
-static inline bool InitDX8(HMODULE& module, LPDIRECT3DDEVICE8& device) {
-    if (!RegisterDummyWindow()) {
-        return false;
+class TDirect3D8Ctx {
+public:
+    TDirect3D8Ctx()
+        : Wnd("dx8 test window")
+        , Module(0)
+        , DX8(nullptr)
+        , Device(nullptr)
+    {
+        if (!Wnd) {
+            return;
+        }
+        Module = LoadLibraryA("d3d8.dll");
+        if (!Module) {
+            return;
+        }
+        DX8CreateFunc create = (DX8CreateFunc)GetProcAddress(Module, "Direct3DCreate8");
+        if (!create) {
+            return;
+        }
+        DX8 = create(D3D_SDK_VERSION);
+        if (!DX8) {
+            return;
+        }
+        D3DPRESENT_PARAMETERS presentParams = {};
+        presentParams.Windowed = true;
+        presentParams.SwapEffect = D3DSWAPEFFECT_FLIP;
+        presentParams.BackBufferFormat = D3DFMT_A8R8G8B8;
+        presentParams.BackBufferWidth = 4;
+        presentParams.BackBufferHeight = 4;
+        presentParams.BackBufferCount = 1;
+        presentParams.hDeviceWindow = NULL;
+        presentParams.hDeviceWindow = Wnd;
+
+        DX8->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, Wnd, D3DCREATE_HARDWARE_VERTEXPROCESSING,
+                          &presentParams, &Device);
     }
-
-    HMODULE hmd = GetModuleHandleA(nullptr);
-
-    HWND hwnd = CreateWindowExA(0, DUMMY_WINDOW, "dx8 test window",
-                    WS_POPUP, 0, 0, 1, 1, nullptr, nullptr,
-                    hmd, nullptr);
-    if (!hwnd) {
-        return false;
+    ~TDirect3D8Ctx() {
+        if (Device) {
+            Device->Release();
+        }
+        if (DX8) {
+            DX8->Release();
+        }
     }
-
-    module = LoadLibraryA("d3d8.dll");
-    if (!module) {
-        return false;
+    HMODULE GetModule() {
+        return Module;
     }
-
-    DX8CreateFunc create = (DX8CreateFunc)GetProcAddress(module, "Direct3DCreate8");
-    if (!create) {
-        return false;
+    LPDIRECT3DDEVICE8 GetDevice() {
+        return Device;
     }
-
-    IDirect3D8* dx8 = create(D3D_SDK_VERSION);
-    if (!dx8) {
-        return false;
-    }
-
-    D3DPRESENT_PARAMETERS presentParams = {};
-    presentParams.Windowed = true;
-    presentParams.SwapEffect = D3DSWAPEFFECT_FLIP;
-    presentParams.BackBufferFormat = D3DFMT_A8R8G8B8;
-    presentParams.BackBufferWidth = 4;
-    presentParams.BackBufferHeight = 4;
-    presentParams.BackBufferCount = 1;
-    presentParams.hDeviceWindow = hwnd;
-
-    dx8->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hwnd, D3DCREATE_HARDWARE_VERTEXPROCESSING,
-                      &presentParams, &device);
-
-    return true;
-}
+private:
+    TDummyWindow Wnd;
+    HMODULE Module;
+    IDirect3D8* DX8;
+    LPDIRECT3DDEVICE8 Device;
+};
 
 void GetDX8Offsets(uint64_t& present) {
-    HMODULE module;
-    LPDIRECT3DDEVICE8 device;
+    TDirect3D8Ctx dx8;
     present = 0;
-    if (InitDX8(module, device)) {
-        present = GetVtableOffset((uint64_t)module, device, 15);
+    if (dx8.GetModule() && dx8.GetDevice()) {
+        present = GetVtableOffset((uint64_t)dx8.GetModule(), dx8.GetDevice(), 15);
     }
 }

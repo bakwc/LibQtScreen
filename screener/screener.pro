@@ -9,7 +9,7 @@ SOURCES += main.cpp \
 HEADERS += \
     screener.h
 
-QT += core network
+QT += gui widgets core network
 
 QMAKE_CXXFLAGS += -std=c++11
 

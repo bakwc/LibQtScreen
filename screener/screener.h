@@ -1,14 +1,15 @@
 #pragma once
 
 #include <QCoreApplication>
+#include <memory>
 
-#include <libdxscreen/screen.h>
-
+class TScreenShotMaker;
 class TScreener : public QCoreApplication {
     Q_OBJECT
 public:
     TScreener(int &argc, char **argv);
+    virtual ~TScreener();
 private:
     void timerEvent(QTimerEvent*);
-    TScreenShotMaker Screener;
+    std::unique_ptr<TScreenShotMaker> Screener;
 };

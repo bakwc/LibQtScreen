@@ -24,4 +24,5 @@ private:
     std::vector<TClientRef> Connections;
     std::set<uint64_t> InjectedPIDs;
     TInjectorHelpInfo InjectorHelpInfo;
+    int N = 0;
 };

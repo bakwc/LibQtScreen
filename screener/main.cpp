@@ -1,8 +1,3 @@
-#include <libdxscreen/inject.h>
-
-#include <iostream>
-#include <windows.h>
-
 #include <QLocalServer>
 #include <QLocalSocket>
 

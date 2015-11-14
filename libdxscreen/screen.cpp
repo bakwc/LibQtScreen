@@ -5,10 +5,14 @@
 #include <windows.h>
 #include <psapi.h>
 
+#include <QDebug>
+
 TScreenShotMaker::TScreenShotMaker() {
     GetDX8Offsets(InjectorHelpInfo.DX8PresentOffset);
     GetDX9Offsets(InjectorHelpInfo.DX9PresentOffset,
                   InjectorHelpInfo.DX9PresentExOffset);
+    GetDXGIOffsets(InjectorHelpInfo.DXGIPresentOffset);
+
     connect(&Server, &QLocalServer::newConnection, [this] {
         Connections.emplace_back(new TClient(this, Server.nextPendingConnection()));
         TClient* client = Connections.back().get();
@@ -36,7 +40,7 @@ void TScreenShotMaker::timerEvent(QTimerEvent*) {
 }
 
 void TScreenShotMaker::InjectAll() {
-
+return;
     /// For testing purpose - to inject to signle process only.
     /*
     int pid = GetProcessID(L"dxtest_dx9.exe");
