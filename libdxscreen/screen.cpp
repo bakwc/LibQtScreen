@@ -3,7 +3,7 @@
 #include "inject.h"
 
 #include <windows.h>
-#include <psapi.h>
+#include <winuser.h>
 
 #include <QDebug>
 
@@ -58,23 +58,52 @@ void TScreenShotMaker::InjectAll() {
     return;
     */
 
-    DWORD procList[1024];
-    DWORD cbNeeded;
-    EnumProcesses(procList, sizeof(procList), &cbNeeded);
-    size_t procCount = cbNeeded / sizeof(DWORD);
-
-    for (size_t i = 0; i < procCount; ++i) {
-        DWORD pid = procList[i];
-
-        if (InjectedPIDs.find(uint64_t(pid)) != InjectedPIDs.end()) {
-            continue;
-        }
-
-        bool injected = InjectDll(pid, INJECTED_DLL);
-        if (!injected) {
-            continue;
-        }
-
-        InjectedPIDs.insert(uint64_t(pid));
+    HWND window = GetForegroundWindow();
+    if (!window) {
+        return;
     }
+    RECT rect;
+    if (!GetWindowRect(window, &rect)) {
+        return;
+    }
+
+    DWORD styles = GetWindowLongPtr(window, GWL_STYLE);
+    if ((styles & WS_MAXIMIZE) && (styles & WS_BORDER)) {
+        return;
+    }
+
+    MONITORINFO lpmi = {0};
+    HMONITOR monitor = MonitorFromRect(&rect, MONITOR_DEFAULTTONEAREST);
+    if (!monitor) {
+        return;
+    }
+    lpmi.cbSize = sizeof(lpmi);
+    if (!GetMonitorInfoA(monitor, &lpmi)) {
+        return;
+    }
+
+    if (rect.left != lpmi.rcMonitor.left ||
+        rect.right != lpmi.rcMonitor.right ||
+        rect.bottom != lpmi.rcMonitor.bottom ||
+        rect.top != lpmi.rcMonitor.top)
+    {
+        return;
+    }
+
+    DWORD pid = 0;
+    GetWindowThreadProcessId(window, &pid);
+    if (!pid) {
+        return;
+    }
+
+    if (InjectedPIDs.find(uint64_t(pid)) != InjectedPIDs.end()) {
+        return;
+    }
+
+    bool injected = InjectDll(pid, INJECTED_DLL);
+    if (!injected) {
+        return;
+    }
+
+    InjectedPIDs.insert(uint64_t(pid));
 }
