@@ -18,11 +18,11 @@ signals:
 private:
     void timerEvent(QTimerEvent*);
     void InjectAll();
+    void RemoveInactiveConnections();
 private:
     QImage LastScreenshot;
     QLocalServer Server;
     std::vector<TClientRef> Connections;
     std::set<uint64_t> InjectedPIDs;
     TInjectorHelpInfo InjectorHelpInfo;
-    int N = 0;
 };

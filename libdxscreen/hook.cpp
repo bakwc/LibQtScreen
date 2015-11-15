@@ -13,14 +13,15 @@ void DoHook(void *func, void *handler) {
     if (OldData.find((uint64_t)origFunc) != OldData.end()) {
         return;
     }
-    DWORD t;
-    VirtualProtect(origFunc, 5, PAGE_EXECUTE_READWRITE, &t);
+    DWORD prevProtect;
+    VirtualProtect(origFunc, 5, PAGE_EXECUTE_READWRITE, &prevProtect);
     uint32_t distance = newFunc - origFunc - 5;
     std::string oldData;
     oldData.resize(5);
     memcpy(&oldData[0], origFunc, 5);
     *origFunc = 0xE9;
     *(uint32_t*)(origFunc + 1) = distance;
+    VirtualProtect(origFunc, 5, prevProtect, &prevProtect);
     OldData[(uint64_t)origFunc] = oldData;
 }
 
@@ -30,6 +31,9 @@ void DoUnHook(void *func) {
         return;
     }
     std::string oldData = OldData[(uint64_t)origFunc];
+    DWORD prevProtect;
+    VirtualProtect(origFunc, 5, PAGE_EXECUTE_READWRITE, &prevProtect);
     memcpy(origFunc, &oldData[0], 5);
+    VirtualProtect(origFunc, 5, prevProtect, &prevProtect);
     OldData.erase((uint64_t)origFunc);
 }

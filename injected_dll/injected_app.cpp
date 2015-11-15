@@ -24,7 +24,7 @@ TInjectedApp::TInjectedApp()
     Info.PID = QCoreApplication::instance()->applicationPid();
     Info.Name = QCoreApplication::instance()->applicationFilePath().toStdString();
 
-    Sock.connectToServer("mothership");
+    startTimer(500);
 }
 
 void TInjectedApp::onScreenshotReady(QImage img) {
@@ -90,4 +90,10 @@ void TInjectedApp::MakeScreenshot() {
     MakeDX10Screen([this](const QImage& img) {
         emit onScreenshotReadySignal(img);
     }, HelpInfo.DXGIPresentOffset);
+}
+
+void TInjectedApp::timerEvent(QTimerEvent *) {
+    if (Sock.state() == QLocalSocket::UnconnectedState) {
+        Sock.connectToServer("mothership");
+    }
 }

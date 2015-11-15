@@ -9,7 +9,7 @@ struct THookCtx {
     void* PresentFun = nullptr;
     TScreenCallback Callback;
 };
-static THookCtx HookCtx;
+static THookCtx* HookCtx = new THookCtx();
 
 static DXGI_FORMAT GetDxgiFormat(DXGI_FORMAT format) {
     if (format == DXGI_FORMAT_B8G8R8A8_UNORM_SRGB) {
@@ -69,14 +69,14 @@ void GetDX10Screenshot(IDXGISwapChain* swapChain) {
     }
 
     QImage screenShotImg = IntArrayToQImage((char*)mapText.pData, textDesc.Height, textDesc.Width);
-    HookCtx.Callback(screenShotImg);
+    HookCtx->Callback(screenShotImg);
 }
 
 static HRESULT STDMETHODCALLTYPE HookPresent(IDXGISwapChain* swapChain,
                                              UINT syncInterval, UINT flags)
 {
     GetDX10Screenshot(swapChain);
-    UnHook(HookCtx.PresentFun);
+    UnHook(HookCtx->PresentFun);
     return swapChain->Present(syncInterval, flags);
 }
 
@@ -87,7 +87,7 @@ void MakeDX10Screen(const TScreenCallback& callback,
     if (!dxgiModule) {
         return;
     }
-    HookCtx.Callback = callback;
-    HookCtx.PresentFun = (void*)((uintptr_t)dxgiModule + (uintptr_t)dxgiOffset);
-    Hook(HookCtx.PresentFun, HookPresent);
+    HookCtx->Callback = callback;
+    HookCtx->PresentFun = (void*)((uintptr_t)dxgiModule + (uintptr_t)dxgiOffset);
+    Hook(HookCtx->PresentFun, HookPresent);
 }

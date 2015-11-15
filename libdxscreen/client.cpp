@@ -26,8 +26,16 @@ void TClient::MakeScreenshot() {
     Send(CMD_ScreenShot, "doit");
 }
 
-QImage TClient::GetLastScreenshot() {
+QImage TClient::GetLastScreenshot() const {
     return LastScreenshot;
+}
+
+const TInjectedAppInfo& TClient::GetInfo() const {
+    return Info;
+}
+
+bool TClient::IsActive() const {
+    return Sock->state() == QLocalSocket::ConnectedState;
 }
 
 void TClient::timerEvent(QTimerEvent *) {

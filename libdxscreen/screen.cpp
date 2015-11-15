@@ -36,6 +36,7 @@ QImage TScreenShotMaker::GetLastScreenshot() {
 }
 
 void TScreenShotMaker::timerEvent(QTimerEvent*) {
+    RemoveInactiveConnections();
     InjectAll();
 }
 
@@ -57,7 +58,6 @@ void TScreenShotMaker::InjectAll() {
     qDebug() << "injected";
     return;
     */
-
     HWND window = GetForegroundWindow();
     if (!window) {
         return;
@@ -104,6 +104,18 @@ void TScreenShotMaker::InjectAll() {
     if (!injected) {
         return;
     }
+}
 
-    InjectedPIDs.insert(uint64_t(pid));
+void TScreenShotMaker::RemoveInactiveConnections() {
+    std::vector<TClientRef> newConnections;
+    InjectedPIDs.clear();
+    for (auto&& c: Connections) {
+        if (c->IsActive()) {
+            newConnections.push_back(c);
+            if (c->GetInfo().PID) {
+                InjectedPIDs.insert(uint64_t(c->GetInfo().PID));
+            }
+        }
+    }
+    Connections.swap(newConnections);
 }

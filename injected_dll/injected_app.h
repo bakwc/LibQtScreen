@@ -20,6 +20,7 @@ private:
     void Send(ECommand cmd, const QByteArray& data);
     HMODULE GetSystemModule(const char* module);
     void MakeScreenshot();
+    void timerEvent(QTimerEvent*);
 private:
     TInjectedAppInfo Info;
     TInjectorHelpInfo HelpInfo;

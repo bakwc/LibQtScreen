@@ -14,7 +14,9 @@ public:
     TClient(TScreenShotMaker* screener, QLocalSocket* sock);
     virtual ~TClient();
     void MakeScreenshot();
-    QImage GetLastScreenshot();
+    QImage GetLastScreenshot() const;
+    const TInjectedAppInfo& GetInfo() const;
+    bool IsActive() const;
 signals:
     void OnScreenshotReady();
 private:
@@ -30,4 +32,4 @@ private:
     QByteArray Buffer;
     QImage LastScreenshot;
 };
-using TClientRef = std::unique_ptr<TClient>;
+using TClientRef = std::shared_ptr<TClient>;

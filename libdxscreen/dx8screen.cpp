@@ -8,7 +8,7 @@ struct THookCtx {
     void* PresentFun = nullptr;
     TScreenCallback Callback;
 };
-static THookCtx HookCtx;
+static THookCtx* HookCtx = new THookCtx();
 
 
 void GetDX8Screenshot(IDirect3DDevice8* device) {
@@ -48,7 +48,7 @@ void GetDX8Screenshot(IDirect3DDevice8* device) {
 
 
     QImage screenShotImg = IntArrayToQImage((char*)rect.pBits, desc.Height, desc.Width);
-    HookCtx.Callback(screenShotImg);
+    HookCtx->Callback(screenShotImg);
 
     buffer->Release();
 }
@@ -57,7 +57,7 @@ static HRESULT STDMETHODCALLTYPE HookPresent(IDirect3DDevice8* device,
                     CONST RECT* srcRect, CONST RECT* dstRect,
                     HWND overrideWindow, CONST RGNDATA* dirtyRegion)
 {
-    UnHook(HookCtx.PresentFun);
+    UnHook(HookCtx->PresentFun);
     GetDX8Screenshot(device);
     return device->Present(srcRect, dstRect, overrideWindow, dirtyRegion);
 }
@@ -67,7 +67,7 @@ void MakeDX8Screen(const TScreenCallback& callback, uint64_t presentOffset) {
     if (!dx8module) {
         return;
     }
-    HookCtx.PresentFun = (void*)((uintptr_t)dx8module + (uintptr_t)presentOffset);
-    HookCtx.Callback = callback;
-    Hook(HookCtx.PresentFun, HookPresent);
+    HookCtx->PresentFun = (void*)((uintptr_t)dx8module + (uintptr_t)presentOffset);
+    HookCtx->Callback = callback;
+    Hook(HookCtx->PresentFun, HookPresent);
 }

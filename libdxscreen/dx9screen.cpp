@@ -9,7 +9,7 @@ struct THookCtx {
     void* PresentExFun = nullptr;
     TScreenCallback Callback;
 };
-static THookCtx HookCtx;
+static THookCtx* HookCtx = new THookCtx();
 
 void GetDX9Screenshot(IDirect3DDevice9* device) {
     HRESULT hr;
@@ -47,7 +47,7 @@ void GetDX9Screenshot(IDirect3DDevice9* device) {
     }
 
     QImage screenShotImg = IntArrayToQImage((char*)rect.pBits, desc.Height, desc.Width);
-    HookCtx.Callback(screenShotImg);
+    HookCtx->Callback(screenShotImg);
 
     buffer->Release();
 }
@@ -56,8 +56,8 @@ static HRESULT STDMETHODCALLTYPE HookPresent(IDirect3DDevice9* device,
                 CONST RECT* srcRect, CONST RECT* dstRect,
                 HWND overrideWindow, CONST RGNDATA* dirtyRegion)
 {
-    UnHook(HookCtx.PresentFun);
-    UnHook(HookCtx.PresentExFun);
+    UnHook(HookCtx->PresentFun);
+    UnHook(HookCtx->PresentExFun);
     GetDX9Screenshot(device);
     return device->Present(srcRect, dstRect, overrideWindow, dirtyRegion);
 }
@@ -67,8 +67,8 @@ static HRESULT STDMETHODCALLTYPE HookPresentEx(IDirect3DDevice9Ex* device,
                 HWND overrideWindow, CONST RGNDATA* dirtyRegion,
                 DWORD flags)
 {
-    UnHook(HookCtx.PresentFun);
-    UnHook(HookCtx.PresentExFun);
+    UnHook(HookCtx->PresentFun);
+    UnHook(HookCtx->PresentExFun);
     GetDX9Screenshot(device);
     return device->PresentEx(srcRect, dstRect, overrideWindow, dirtyRegion, flags);
 }
@@ -82,9 +82,9 @@ void MakeDX9Screen(const TScreenCallback& callback,
         return;
     }
 
-    HookCtx.Callback = callback;
-    HookCtx.PresentFun = (void*)((uintptr_t)dx9module + (uintptr_t)presentOffset);
-    Hook(HookCtx.PresentFun, HookPresent);
-    HookCtx.PresentExFun = (void*)((uintptr_t)dx9module + (uintptr_t)presentExOffset);
-    Hook(HookCtx.PresentFun, HookPresentEx);
+    HookCtx->Callback = callback;
+    HookCtx->PresentFun = (void*)((uintptr_t)dx9module + (uintptr_t)presentOffset);
+    Hook(HookCtx->PresentFun, HookPresent);
+    HookCtx->PresentExFun = (void*)((uintptr_t)dx9module + (uintptr_t)presentExOffset);
+    Hook(HookCtx->PresentFun, HookPresentEx);
 }
