@@ -5,7 +5,16 @@
 using TScreenCallback = std::function<void(const QImage&)>;
 
 HMODULE GetSystemModule(const char* module);
-QImage IntArrayToQImage(char* intarray, unsigned rows, unsigned columns);
+
+enum EImgByteFormat {
+    BF_R8G8B8,
+    BF_B8G8R8,
+};
+
+QImage IntArrayToQImage(EImgByteFormat fmt,
+                        char* intarray,
+                        unsigned rows,
+                        unsigned columns);
 
 void MakeDX8Screen(const TScreenCallback& callback,
                    uint64_t presentOffset);
