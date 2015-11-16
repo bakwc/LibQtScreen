@@ -14,5 +14,5 @@ void MakeDX9Screen(const TScreenCallback& callback,
                    uint64_t presentOffset,
                    uint64_t presentExOffset);
 
-void MakeDX10Screen(const TScreenCallback& callback,
+void MakeDXGIScreen(const TScreenCallback& callback,
                     uint64_t dxgiOffset);

@@ -22,7 +22,7 @@ TScreener::~TScreener() {
 void TScreener::timerEvent(QTimerEvent *) {
     static int n = 0;
     n += 1;
-    if (n == 10) {
+    if (n == 30) {
         qDebug() << "making screenshot";
         Screener->MakeScreenshot();
     }

@@ -1,7 +1,8 @@
 #include "dxscreen.h"
+#include "hook.h"
 
 #include <windows.h>
-#include <d3d10.h>
+#include <d3d11.h>
 #include <dxgi.h>
 
 
@@ -15,20 +16,20 @@ static DXGI_FORMAT GetDxgiFormat(DXGI_FORMAT format) {
     return format;
 }
 
-void GetDX10Screenshot(IDXGISwapChain* swapChain, QImage& screenShotImg) {
+void GetDX11Screenshot(IDXGISwapChain* swapChain, QImage& screenShotImg) {
     IDXGIResource *backbufferPtr = nullptr;
-    swapChain->GetBuffer(0, __uuidof(ID3D10Resource), (void**)&backbufferPtr);
+    swapChain->GetBuffer(0, __uuidof(ID3D11Resource), (void**)&backbufferPtr);
     if (!backbufferPtr) {
         return;
     }
 
-    ID3D10Resource* backbuffer;
-    HRESULT hr = backbufferPtr->QueryInterface(__uuidof(ID3D10Resource), (void**)&backbuffer);
+    ID3D11Resource* backbuffer;
+    HRESULT hr = backbufferPtr->QueryInterface(__uuidof(ID3D11Resource), (void**)&backbuffer);
     if (FAILED(hr)) {
         return;
     }
-    ID3D10Device* device;
-    hr = swapChain->GetDevice(__uuidof(ID3D10Device), (void**)&device);
+    ID3D11Device* device;
+    hr = swapChain->GetDevice(__uuidof(ID3D11Device), (void**)&device);
     if (FAILED(hr)) {
         return;
     }
@@ -38,30 +39,39 @@ void GetDX10Screenshot(IDXGISwapChain* swapChain, QImage& screenShotImg) {
     if (FAILED(hr)) {
         return;
     }
-    D3D10_TEXTURE2D_DESC textDesc = {};
+    D3D11_TEXTURE2D_DESC textDesc = {};
     textDesc.Format = GetDxgiFormat(desc.BufferDesc.Format);
     textDesc.Width = desc.BufferDesc.Width;
     textDesc.Height = desc.BufferDesc.Height;
     textDesc.MipLevels = 1;
     textDesc.ArraySize = 1;
     textDesc.SampleDesc.Count = 1;
-    textDesc.Usage = D3D10_USAGE_STAGING;
-    textDesc.CPUAccessFlags = D3D10_CPU_ACCESS_READ;
+    textDesc.Usage = D3D11_USAGE_STAGING;
+    textDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
 
-    ID3D10Texture2D* texture = nullptr;
+    ID3D11Texture2D* texture = nullptr;
     hr = device->CreateTexture2D(&textDesc, 0, &texture);
     if (FAILED(hr)) {
         return;
     }
 
-    device->CopyResource(texture, backbuffer);
+    ID3D11DeviceContext* context = nullptr;
 
-    D3D10_MAPPED_TEXTURE2D mapText = {0, 0};
-    hr = texture->Map(0, D3D10_MAP_READ, 0, &mapText);
+    device->Release();
+
+    device->GetImmediateContext(&context);
+    if (!context) {
+        return;
+    }
+
+    context->CopyResource(texture, backbuffer);
+
+    D3D11_MAPPED_SUBRESOURCE mapSubres = {0, 0, 0};
+
+    hr = context->Map(texture, 0, D3D11_MAP_READ, 0, &mapSubres);
     if (FAILED(hr)) {
         return;
     }
 
-    screenShotImg = IntArrayToQImage((char*)mapText.pData, textDesc.Height, textDesc.Width);
+    screenShotImg = IntArrayToQImage((char*)mapSubres.pData, textDesc.Height, textDesc.Width);
 }
-

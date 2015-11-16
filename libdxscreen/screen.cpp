@@ -104,6 +104,7 @@ void TScreenShotMaker::InjectAll() {
     if (!injected) {
         return;
     }
+    qDebug() << "injected";
 }
 
 void TScreenShotMaker::RemoveInactiveConnections() {

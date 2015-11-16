@@ -27,7 +27,9 @@ SOURCES += inject.cpp \
     dxscreen.cpp \
     dx8screen.cpp \
     dx9screen.cpp \
+    dxgi_screen.cpp \
     dx10screen.cpp \
+    dx11screen.cpp \
     screen.cpp \
     client.cpp
 
