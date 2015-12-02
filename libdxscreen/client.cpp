@@ -7,6 +7,7 @@
 TClient::TClient(TScreenShotMaker* screener, QLocalSocket* sock)
     : Screener(screener)
     , Sock(sock)
+    , Failed(true)
 {
     connect(sock, &QLocalSocket::readyRead, [this] {
         Buffer += Sock->readAll();
@@ -23,6 +24,7 @@ TClient::~TClient() {
 }
 
 void TClient::MakeScreenshot() {
+    Failed = false;
     Send(CMD_ScreenShot, "doit");
 }
 
@@ -36,6 +38,10 @@ const TInjectedAppInfo& TClient::GetInfo() const {
 
 bool TClient::IsActive() const {
     return Sock->state() == QLocalSocket::ConnectedState;
+}
+
+bool TClient::IsScreenFailed() const {
+    return Failed;
 }
 
 void TClient::timerEvent(QTimerEvent *) {
@@ -72,6 +78,10 @@ void TClient::OnPacketReceived(ECommand cmd, const QByteArray& data) {
         buffer.open(QIODevice::ReadOnly);
         LastScreenshot.load(&buffer, "png");
         emit OnScreenshotReady();
+    } break;
+    case CMD_Error: {
+        Failed = true;
+        emit OnFailed();
     } break;
     }
 }

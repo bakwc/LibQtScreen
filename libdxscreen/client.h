@@ -17,8 +17,10 @@ public:
     QImage GetLastScreenshot() const;
     const TInjectedAppInfo& GetInfo() const;
     bool IsActive() const;
+    bool IsScreenFailed() const;
 signals:
     void OnScreenshotReady();
+    void OnFailed();
 private:
     void timerEvent(QTimerEvent*);
 
@@ -31,5 +33,6 @@ private:
     QLocalSocket* Sock;
     QByteArray Buffer;
     QImage LastScreenshot;
+    bool Failed;
 };
 using TClientRef = std::shared_ptr<TClient>;

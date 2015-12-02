@@ -1,6 +1,7 @@
 #include "client.h"
 
 #include <QObject>
+#include <QTimer>
 #include <QImage>
 #include <QLocalServer>
 #include <vector>
@@ -15,14 +16,18 @@ public:
     QImage GetLastScreenshot();
 signals:
     void OnScreenshotReady();
+    void OnFailed();
 private:
     void timerEvent(QTimerEvent*);
     void InjectAll();
     void RemoveInactiveConnections();
+    void CheckFailedScreens();
 private:
     QImage LastScreenshot;
     QLocalServer Server;
     std::vector<TClientRef> Connections;
     std::set<uint64_t> InjectedPIDs;
     TInjectorHelpInfo InjectorHelpInfo;
+    QTimer TimeoutTimer;
+    bool MakingScreen;
 };

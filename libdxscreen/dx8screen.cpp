@@ -60,12 +60,13 @@ static HRESULT STDMETHODCALLTYPE HookPresent(IDirect3DDevice8* device,
     return device->Present(srcRect, dstRect, overrideWindow, dirtyRegion);
 }
 
-void MakeDX8Screen(const TScreenCallback& callback, uint64_t presentOffset) {
+bool MakeDX8Screen(const TScreenCallback& callback, uint64_t presentOffset) {
     HMODULE dx8module = GetSystemModule("d3d8.dll");
     if (!dx8module) {
-        return;
+        return false;
     }
     HookCtx->PresentFun = (void*)((uintptr_t)dx8module + (uintptr_t)presentOffset);
     HookCtx->Callback = callback;
     Hook(HookCtx->PresentFun, HookPresent);
+    return true;
 }

@@ -17,14 +17,14 @@ QImage IntArrayToQImage(EImgByteFormat fmt,
                         unsigned rows,
                         unsigned columns);
 
-void MakeDX8Screen(const TScreenCallback& callback,
+bool MakeDX8Screen(const TScreenCallback& callback,
                    uint64_t presentOffset);
 
-void MakeDX9Screen(const TScreenCallback& callback,
+bool MakeDX9Screen(const TScreenCallback& callback,
                    uint64_t presentOffset,
                    uint64_t presentExOffset);
 
-void MakeDXGIScreen(const TScreenCallback& callback,
+bool MakeDXGIScreen(const TScreenCallback& callback,
                     uint64_t dxgiOffset);
 
-void MakeOpenGLScreen(const TScreenCallback& callback);
+bool MakeOpenGLScreen(const TScreenCallback& callback);

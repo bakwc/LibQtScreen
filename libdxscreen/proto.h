@@ -7,6 +7,7 @@ enum ECommand {
     CMD_Ping,
     CMD_Info,
     CMD_ScreenShot,
+    CMD_Error,
 };
 
 struct TInjectedAppInfo {

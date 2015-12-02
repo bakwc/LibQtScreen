@@ -19,7 +19,7 @@ private:
     void OnPacketReceived(ECommand cmd, const QByteArray& data);
     void Send(ECommand cmd, const QByteArray& data);
     HMODULE GetSystemModule(const char* module);
-    void MakeScreenshot();
+    bool MakeScreenshot();
     void timerEvent(QTimerEvent*);
 private:
     TInjectedAppInfo Info;

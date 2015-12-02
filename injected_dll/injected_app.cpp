@@ -64,7 +64,9 @@ void TInjectedApp::OnPacketReceived(ECommand cmd, const QByteArray& data) {
         Send(CMD_Info, QByteArray::fromStdString(out.str()));
     } break;
     case CMD_ScreenShot: {
-        MakeScreenshot();
+        if (!MakeScreenshot()) {
+            Send(CMD_Error, "error");
+        }
     } break;
     default:
         break;
@@ -80,19 +82,21 @@ void TInjectedApp::Send(ECommand cmd, const QByteArray& data) {
     Sock.write(packet);
 }
 
-void TInjectedApp::MakeScreenshot() {
-    MakeDX8Screen([this](const QImage& img) {
+bool TInjectedApp::MakeScreenshot() {
+    bool success = false;
+    success |= MakeDX8Screen([this](const QImage& img) {
         emit onScreenshotReadySignal(img);
     }, HelpInfo.DX8PresentOffset);
-    MakeDX9Screen([this](const QImage& img) {
+    success |= MakeDX9Screen([this](const QImage& img) {
         emit onScreenshotReadySignal(img);
     }, HelpInfo.DX9PresentOffset, HelpInfo.DX9PresentExOffset);
-    MakeDXGIScreen([this](const QImage& img) {
+    success |= MakeDXGIScreen([this](const QImage& img) {
         emit onScreenshotReadySignal(img);
     }, HelpInfo.DXGIPresentOffset);
-    MakeOpenGLScreen([this](const QImage& img) {
+    success |= MakeOpenGLScreen([this](const QImage& img) {
         emit onScreenshotReadySignal(img);
     });
+    return success;
 }
 
 void TInjectedApp::timerEvent(QTimerEvent *) {

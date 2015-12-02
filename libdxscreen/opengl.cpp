@@ -50,11 +50,15 @@ DECLSPEC_NOINLINE void APIENTRY Hooked_glEnd(void) {
     glEnd();
 }
 
-void MakeOpenGLScreen(const TScreenCallback& callback) {
-    HMODULE m_hOpenGL=GetModuleHandle(L"opengl32.dll");
+bool MakeOpenGLScreen(const TScreenCallback& callback) {
+    HMODULE hOpenGL=GetModuleHandle(L"opengl32.dll");
+    if (!hOpenGL) {
+        return false;
+    }
     HookCtx->Callback = callback;
-    HookCtx->glBeginFunc = (void*)GetProcAddress(m_hOpenGL,"glBegin");
-    HookCtx->glEndFunc = (void*)GetProcAddress(m_hOpenGL,"glEnd");
+    HookCtx->glBeginFunc = (void*)GetProcAddress(hOpenGL, "glBegin");
+    HookCtx->glEndFunc = (void*)GetProcAddress(hOpenGL, "glEnd");
     Hook(HookCtx->glBeginFunc, &Hooked_glBegin);
     //Hook(HookCtx->glEndFunc, &Hooked_glEnd);
+    return true;
 }

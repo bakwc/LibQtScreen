@@ -73,13 +73,13 @@ static HRESULT STDMETHODCALLTYPE HookPresentEx(IDirect3DDevice9Ex* device,
     return device->PresentEx(srcRect, dstRect, overrideWindow, dirtyRegion, flags);
 }
 
-void MakeDX9Screen(const TScreenCallback& callback,
+bool MakeDX9Screen(const TScreenCallback& callback,
                    uint64_t presentOffset,
                    uint64_t presentExOffset)
 {
     HMODULE dx9module = GetSystemModule("d3d9.dll");
     if (!dx9module) {
-        return;
+        return false;
     }
 
     HookCtx->Callback = callback;
@@ -87,4 +87,5 @@ void MakeDX9Screen(const TScreenCallback& callback,
     Hook(HookCtx->PresentFun, HookPresent);
     HookCtx->PresentExFun = (void*)((uintptr_t)dx9module + (uintptr_t)presentExOffset);
     Hook(HookCtx->PresentFun, HookPresentEx);
+    return true;
 }

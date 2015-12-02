@@ -29,14 +29,15 @@ static HRESULT STDMETHODCALLTYPE HookPresent(IDXGISwapChain* swapChain,
     return swapChain->Present(syncInterval, flags);
 }
 
-void MakeDXGIScreen(const TScreenCallback& callback,
+bool MakeDXGIScreen(const TScreenCallback& callback,
                     uint64_t dxgiOffset)
 {
     HMODULE dxgiModule = GetSystemModule("dxgi.dll");
     if (!dxgiModule) {
-        return;
+        return false;
     }
     HookCtx->Callback = callback;
     HookCtx->PresentFun = (void*)((uintptr_t)dxgiModule + (uintptr_t)dxgiOffset);
     Hook(HookCtx->PresentFun, HookPresent);
+    return true;
 }

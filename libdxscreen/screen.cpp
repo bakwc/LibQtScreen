@@ -17,15 +17,38 @@ TScreenShotMaker::TScreenShotMaker() {
         Connections.emplace_back(new TClient(this, Server.nextPendingConnection()));
         TClient* client = Connections.back().get();
         connect(client, &TClient::OnScreenshotReady, [this, client] {
+            if (!MakingScreen) {
+                return;
+            }
             LastScreenshot = client->GetLastScreenshot();
+            MakingScreen = false;
+            TimeoutTimer.stop();
             emit OnScreenshotReady();
         });
+        connect(client, &TClient::OnFailed, [this] {
+            CheckFailedScreens();
+        });
     });
+
+    MakingScreen = false;
+
+    connect(&TimeoutTimer, QTimer::timeout, [this] {
+        TimeoutTimer.stop();
+        MakingScreen = false;
+        emit OnFailed();
+    });
+
     startTimer(1000);
     Server.listen("mothership");
 }
 
 void TScreenShotMaker::MakeScreenshot() {
+    if (Connections.size() == 0) {
+        emit OnFailed();
+        return;
+    }
+    MakingScreen = true;
+    TimeoutTimer.start(200);
     for (auto&& cli: Connections) {
         cli->MakeScreenshot();
     }
@@ -119,4 +142,21 @@ void TScreenShotMaker::RemoveInactiveConnections() {
         }
     }
     Connections.swap(newConnections);
+}
+
+void TScreenShotMaker::CheckFailedScreens() {
+    if (!MakingScreen) {
+        return;
+    }
+    bool anyInProgress = false;
+    for (auto&& c: Connections) {
+        if (!c->IsScreenFailed()) {
+            anyInProgress = true;
+        }
+    }
+    if (!anyInProgress) {
+        MakingScreen = false;
+        TimeoutTimer.stop();
+        emit OnFailed();
+    }
 }
