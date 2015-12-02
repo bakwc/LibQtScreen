@@ -43,7 +43,7 @@ void TScreenShotMaker::timerEvent(QTimerEvent*) {
 void TScreenShotMaker::InjectAll() {
     /// For testing purpose - to inject to signle process only.
     /*
-    int pid = GetProcessID(L"dxtest_dx9.exe");
+    int pid = GetProcessID(L"opengl.exe");
     if (!pid) {
         return;
     }

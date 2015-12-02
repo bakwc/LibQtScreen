@@ -62,7 +62,7 @@ void GetDX10Screenshot(IDXGISwapChain* swapChain, QImage& screenShotImg) {
         return;
     }
 
-    EImgByteFormat fmt = BF_R8G8B8;
+    EImgByteFormat fmt = BF_R8G8B8A8;
     if (textDesc.Format == DXGI_FORMAT_B8G8R8A8_UNORM ||
         textDesc.Format == DXGI_FORMAT_B8G8R8X8_UNORM ||
         textDesc.Format == DXGI_FORMAT_B8G8R8A8_TYPELESS ||
@@ -70,7 +70,7 @@ void GetDX10Screenshot(IDXGISwapChain* swapChain, QImage& screenShotImg) {
         textDesc.Format == DXGI_FORMAT_B8G8R8X8_TYPELESS ||
         textDesc.Format == DXGI_FORMAT_B8G8R8X8_UNORM_SRGB)
     {
-        fmt == BF_B8G8R8;
+        fmt == BF_B8G8R8A8;
     }
 
     screenShotImg = IntArrayToQImage(fmt, (char*)mapText.pData, textDesc.Height, textDesc.Width);

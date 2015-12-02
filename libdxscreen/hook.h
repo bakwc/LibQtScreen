@@ -1,6 +1,6 @@
 #pragma once
 
-void DoHook(void* func, void* handler);
+bool DoHook(void *addr,void *handler);
 void DoUnHook(void* func);
 
 #define Hook(func, handler) (DoHook((void*)(func), (void*)(handler)))

@@ -31,7 +31,8 @@ SOURCES += inject.cpp \
     dx10screen.cpp \
     dx11screen.cpp \
     screen.cpp \
-    client.cpp
+    client.cpp \
+    opengl.cpp
 
 # injected_dll
 win32:CONFIG(release, debug|release): {

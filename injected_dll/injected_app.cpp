@@ -90,6 +90,9 @@ void TInjectedApp::MakeScreenshot() {
     MakeDXGIScreen([this](const QImage& img) {
         emit onScreenshotReadySignal(img);
     }, HelpInfo.DXGIPresentOffset);
+    MakeOpenGLScreen([this](const QImage& img) {
+        emit onScreenshotReadySignal(img);
+    });
 }
 
 void TInjectedApp::timerEvent(QTimerEvent *) {

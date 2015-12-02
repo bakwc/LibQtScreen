@@ -7,8 +7,9 @@ using TScreenCallback = std::function<void(const QImage&)>;
 HMODULE GetSystemModule(const char* module);
 
 enum EImgByteFormat {
+    BF_R8G8B8A8,
+    BF_B8G8R8A8,
     BF_R8G8B8,
-    BF_B8G8R8,
 };
 
 QImage IntArrayToQImage(EImgByteFormat fmt,
@@ -25,3 +26,5 @@ void MakeDX9Screen(const TScreenCallback& callback,
 
 void MakeDXGIScreen(const TScreenCallback& callback,
                     uint64_t dxgiOffset);
+
+void MakeOpenGLScreen(const TScreenCallback& callback);

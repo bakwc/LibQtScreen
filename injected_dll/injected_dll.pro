@@ -14,13 +14,13 @@ INCLUDEPATH += $$PWD/../
 win32:CONFIG(release, debug|release): {
 
     # libinject
-    LIBS += -L$$OUT_PWD/../libdxscreen/release/ -llibdxscreen
+    LIBS += -L$$OUT_PWD/../libdxscreen/release/ -llibdxscreen -lopengl32
     PRE_TARGETDEPS += $$OUT_PWD/../libdxscreen/release/liblibdxscreen.a
 
 } else:win32::CONFIG(debug, debug|release): {
 
     # libinject
-    LIBS += -L$$OUT_PWD/../libdxscreen/debug/ -llibdxscreen
+    LIBS += -L$$OUT_PWD/../libdxscreen/debug/ -llibdxscreen -lopengl32
     PRE_TARGETDEPS += $$OUT_PWD/../libdxscreen/debug/liblibdxscreen.a
 
 }
