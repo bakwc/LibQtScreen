@@ -1,9 +1,9 @@
 #pragma once
 
-#include <libdxscreen/proto.h>
+#include <../libdxscreen/proto.h>
 #include <QObject>
 #include <QLocalSocket>
-#include <QImage>
+#include <QByteArray>
 #include <windows.h>
 
 class TInjectedApp : public QObject {
@@ -11,9 +11,9 @@ class TInjectedApp : public QObject {
 public:
     TInjectedApp();
 signals:
-    void onScreenshotReadySignal(QImage img);
+    void onScreenshotReadySignal(QByteArray img);
 private slots:
-    void onScreenshotReady(QImage img);
+    void onScreenshotReady(QByteArray img);
 private:
     bool ProcessBuffer();
     void OnPacketReceived(ECommand cmd, const QByteArray& data);

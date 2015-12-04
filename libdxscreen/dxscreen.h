@@ -1,8 +1,8 @@
-#include <QImage>
+#include <QByteArray>
 #include <functional>
 #include <windows.h>
 
-using TScreenCallback = std::function<void(const QImage&)>;
+using TScreenCallback = std::function<void(const QByteArray&)>;
 
 HMODULE GetSystemModule(const char* module);
 
@@ -12,10 +12,10 @@ enum EImgByteFormat {
     BF_R8G8B8,
 };
 
-QImage IntArrayToQImage(EImgByteFormat fmt,
-                        char* intarray,
-                        unsigned rows,
-                        unsigned columns);
+QByteArray PackImageData(EImgByteFormat fmt,
+                         char* intarray,
+                         unsigned rows,
+                         unsigned columns);
 
 bool MakeDX8Screen(const TScreenCallback& callback,
                    uint64_t presentOffset);

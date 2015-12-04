@@ -46,8 +46,8 @@ void GetDX9Screenshot(IDirect3DDevice9* device) {
         return;
     }
 
-    QImage screenShotImg = IntArrayToQImage(BF_R8G8B8A8, (char*)rect.pBits, desc.Height, desc.Width);
-    HookCtx->Callback(screenShotImg);
+    QByteArray screen = PackImageData(BF_R8G8B8A8, (char*)rect.pBits, desc.Height, desc.Width);
+    HookCtx->Callback(screen);
 
     buffer->Release();
 }

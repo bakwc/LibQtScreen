@@ -1,26 +1,26 @@
 TARGET = injected_dll
 TEMPLATE = lib
 SOURCES += main.cpp \
-    injected_app.cpp
+    injected_app.cpp \
+    ../libdxscreen/proto.cpp \
+    ../libdxscreen/dx8screen.cpp \
+    ../libdxscreen/dx9screen.cpp \
+    ../libdxscreen/dx10screen.cpp \
+    ../libdxscreen/dx11screen.cpp \
+    ../libdxscreen/dxgi_screen.cpp \
+    ../libdxscreen/dxscreen.cpp \
+    ../libdxscreen/opengl.cpp \
+    ../libdxscreen/hook.cpp
 QMAKE_CXXFLAGS += -std=c++11
 QT += core network
+
+QT -= gui widgets
+
+
 QMAKE_CXXFLAGS += -std=c++11
 
 HEADERS += \
-    injected_app.h
-
-INCLUDEPATH += $$PWD/../
-
-win32:CONFIG(release, debug|release): {
-
-    # libinject
-    LIBS += -L$$OUT_PWD/../libdxscreen/release/ -llibdxscreen -lopengl32
-    PRE_TARGETDEPS += $$OUT_PWD/../libdxscreen/release/liblibdxscreen.a
-
-} else:win32::CONFIG(debug, debug|release): {
-
-    # libinject
-    LIBS += -L$$OUT_PWD/../libdxscreen/debug/ -llibdxscreen -lopengl32
-    PRE_TARGETDEPS += $$OUT_PWD/../libdxscreen/debug/liblibdxscreen.a
-
-}
+    injected_app.h \
+    ../libdxscreen/proto.h \
+    ../libdxscreen/dxscreen.h \
+    ../libdxscreen/hook.h

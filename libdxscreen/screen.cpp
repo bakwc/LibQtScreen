@@ -31,6 +31,7 @@ TScreenShotMaker::TScreenShotMaker() {
     });
 
     MakingScreen = false;
+    FullScreenProcessID = 0;
 
     connect(&TimeoutTimer, QTimer::timeout, [this] {
         TimeoutTimer.stop();
@@ -38,19 +39,22 @@ TScreenShotMaker::TScreenShotMaker() {
         emit OnFailed();
     });
 
-    startTimer(1000);
+    startTimer(500);
     Server.listen("mothership");
 }
 
 void TScreenShotMaker::MakeScreenshot() {
-    if (Connections.size() == 0) {
+    if (Connections.size() == 0 || FullScreenProcessID == 0) {
         emit OnFailed();
         return;
     }
-    MakingScreen = true;
-    TimeoutTimer.start(200);
     for (auto&& cli: Connections) {
-        cli->MakeScreenshot();
+        if (cli->GetInfo().PID == FullScreenProcessID) {
+            MakingScreen = true;
+            TimeoutTimer.start(1000);
+            cli->MakeScreenshot();
+            break;
+        }
     }
 }
 
@@ -83,25 +87,30 @@ void TScreenShotMaker::InjectAll() {
     */
     HWND window = GetForegroundWindow();
     if (!window) {
+        FullScreenProcessID = 0;
         return;
     }
     RECT rect;
     if (!GetWindowRect(window, &rect)) {
+        FullScreenProcessID = 0;
         return;
     }
 
     DWORD styles = GetWindowLongPtr(window, GWL_STYLE);
     if ((styles & WS_MAXIMIZE) && (styles & WS_BORDER)) {
+        FullScreenProcessID = 0;
         return;
     }
 
     MONITORINFO lpmi = {0};
     HMONITOR monitor = MonitorFromRect(&rect, MONITOR_DEFAULTTONEAREST);
     if (!monitor) {
+        FullScreenProcessID = 0;
         return;
     }
     lpmi.cbSize = sizeof(lpmi);
     if (!GetMonitorInfoA(monitor, &lpmi)) {
+        FullScreenProcessID = 0;
         return;
     }
 
@@ -110,14 +119,18 @@ void TScreenShotMaker::InjectAll() {
         rect.bottom != lpmi.rcMonitor.bottom ||
         rect.top != lpmi.rcMonitor.top)
     {
+        FullScreenProcessID = 0;
         return;
     }
 
     DWORD pid = 0;
     GetWindowThreadProcessId(window, &pid);
     if (!pid) {
+        FullScreenProcessID = 0;
         return;
     }
+
+    FullScreenProcessID = pid;
 
     if (InjectedPIDs.find(uint64_t(pid)) != InjectedPIDs.end()) {
         return;
@@ -127,7 +140,7 @@ void TScreenShotMaker::InjectAll() {
     if (!injected) {
         return;
     }
-    qDebug() << "injected";
+    //qDebug() << "injected";
 }
 
 void TScreenShotMaker::RemoveInactiveConnections() {

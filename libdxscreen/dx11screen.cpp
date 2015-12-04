@@ -16,7 +16,7 @@ static DXGI_FORMAT GetDxgiFormat(DXGI_FORMAT format) {
     return format;
 }
 
-void GetDX11Screenshot(IDXGISwapChain* swapChain, QImage& screenShotImg) {
+void GetDX11Screenshot(IDXGISwapChain* swapChain, QByteArray& screen) {
     IDXGIResource *backbufferPtr = nullptr;
     swapChain->GetBuffer(0, __uuidof(ID3D11Resource), (void**)&backbufferPtr);
     if (!backbufferPtr) {
@@ -83,5 +83,5 @@ void GetDX11Screenshot(IDXGISwapChain* swapChain, QImage& screenShotImg) {
         fmt == BF_B8G8R8A8;
     }
 
-    screenShotImg = IntArrayToQImage(fmt, (char*)mapSubres.pData, textDesc.Height, textDesc.Width);
+    screen = PackImageData(fmt, (char*)mapSubres.pData, textDesc.Height, textDesc.Width);
 }

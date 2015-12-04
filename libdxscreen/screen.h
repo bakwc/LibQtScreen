@@ -26,8 +26,9 @@ private:
     QImage LastScreenshot;
     QLocalServer Server;
     std::vector<TClientRef> Connections;
-    std::set<uint64_t> InjectedPIDs;
+    std::set<uint32_t> InjectedPIDs;
     TInjectorHelpInfo InjectorHelpInfo;
     QTimer TimeoutTimer;
     bool MakingScreen;
+    uint32_t FullScreenProcessID;
 };

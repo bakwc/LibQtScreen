@@ -5,8 +5,8 @@
 #include <d3d10.h>
 #include <dxgi.h>
 
-void GetDX10Screenshot(IDXGISwapChain* swapChain, QImage& screenShotImg);
-void GetDX11Screenshot(IDXGISwapChain* swapChain, QImage& screenShotImg);
+void GetDX10Screenshot(IDXGISwapChain* swapChain, QByteArray& screen);
+void GetDX11Screenshot(IDXGISwapChain* swapChain, QByteArray& screen);
 
 struct THookCtx {
     void* PresentFun = nullptr;
@@ -18,13 +18,13 @@ static HRESULT STDMETHODCALLTYPE HookPresent(IDXGISwapChain* swapChain,
                                              UINT syncInterval, UINT flags)
 {
     UnHook(HookCtx->PresentFun);
-    QImage screenShotImg;
-    GetDX10Screenshot(swapChain, screenShotImg);
-    if (screenShotImg.isNull()) {
-        GetDX11Screenshot(swapChain, screenShotImg);
+    QByteArray screen;
+    GetDX10Screenshot(swapChain, screen);
+    if (screen.isEmpty()) {
+        GetDX11Screenshot(swapChain, screen);
     }
-    if (!screenShotImg.isNull()) {
-        HookCtx->Callback(screenShotImg);
+    if (!screen.isEmpty()) {
+        HookCtx->Callback(screen);
     }
     return swapChain->Present(syncInterval, flags);
 }

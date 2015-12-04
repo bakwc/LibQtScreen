@@ -1,15 +1,13 @@
 #include "injected_app.h"
 
-#include <libdxscreen/dxscreen.h>
+#include <../libdxscreen/dxscreen.h>
 
 #include <QProcess>
-#include <QDebug>
 #include <sstream>
 #include <QBuffer>
 #include <QCoreApplication>
 
-TInjectedApp::TInjectedApp()
-{
+TInjectedApp::TInjectedApp() {
     connect(&Sock, &QLocalSocket::readyRead, [this] {
         Buffer += Sock.readAll();
         while (ProcessBuffer()) {
@@ -27,12 +25,8 @@ TInjectedApp::TInjectedApp()
     startTimer(500);
 }
 
-void TInjectedApp::onScreenshotReady(QImage img) {
-    QByteArray packet;
-    QBuffer buffer(&packet);
-    buffer.open(QIODevice::WriteOnly);
-    img.save(&buffer, "png");
-    Send(CMD_ScreenShot, packet);
+void TInjectedApp::onScreenshotReady(QByteArray img) {
+    Send(CMD_ScreenShot, img);
 }
 
 bool TInjectedApp::ProcessBuffer() {
@@ -84,16 +78,16 @@ void TInjectedApp::Send(ECommand cmd, const QByteArray& data) {
 
 bool TInjectedApp::MakeScreenshot() {
     bool success = false;
-    success |= MakeDX8Screen([this](const QImage& img) {
+    success |= MakeDX8Screen([this](const QByteArray& img) {
         emit onScreenshotReadySignal(img);
     }, HelpInfo.DX8PresentOffset);
-    success |= MakeDX9Screen([this](const QImage& img) {
+    success |= MakeDX9Screen([this](const QByteArray& img) {
         emit onScreenshotReadySignal(img);
     }, HelpInfo.DX9PresentOffset, HelpInfo.DX9PresentExOffset);
-    success |= MakeDXGIScreen([this](const QImage& img) {
+    success |= MakeDXGIScreen([this](const QByteArray& img) {
         emit onScreenshotReadySignal(img);
     }, HelpInfo.DXGIPresentOffset);
-    success |= MakeOpenGLScreen([this](const QImage& img) {
+    success |= MakeOpenGLScreen([this](const QByteArray& img) {
         emit onScreenshotReadySignal(img);
     });
     return success;
