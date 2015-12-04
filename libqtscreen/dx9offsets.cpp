@@ -1,32 +1,34 @@
 #include "dxoffsets.h"
 #include "dummy_window.h"
 
-#include <d3d8.h>
+#include <d3d9.h>
 #include <windows.h>
 
-typedef IDirect3D8 *(WINAPI *DX8CreateFunc)(UINT);
+namespace NQtScreen {
 
-class TDirect3D8Ctx {
+typedef IDirect3D9 *(WINAPI *DX9CreateFunc)(UINT);
+
+class TDirect3D9Ctx {
 public:
-    TDirect3D8Ctx()
+    TDirect3D9Ctx()
         : Wnd("dx8 test window")
         , Module(0)
-        , DX8(nullptr)
+        , DX9(nullptr)
         , Device(nullptr)
     {
         if (!Wnd) {
             return;
         }
-        Module = LoadLibraryA("d3d8.dll");
+        Module = LoadLibraryA("d3d9.dll");
         if (!Module) {
             return;
         }
-        DX8CreateFunc create = (DX8CreateFunc)GetProcAddress(Module, "Direct3DCreate8");
+        DX9CreateFunc create = (DX9CreateFunc)GetProcAddress(Module, "Direct3DCreate9");
         if (!create) {
             return;
         }
-        DX8 = create(D3D_SDK_VERSION);
-        if (!DX8) {
+        DX9 = create(D3D_SDK_VERSION);
+        if (!DX9) {
             return;
         }
         D3DPRESENT_PARAMETERS presentParams = {};
@@ -36,37 +38,41 @@ public:
         presentParams.BackBufferWidth = 4;
         presentParams.BackBufferHeight = 4;
         presentParams.BackBufferCount = 1;
-        presentParams.hDeviceWindow = NULL;
         presentParams.hDeviceWindow = Wnd;
 
-        DX8->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, Wnd, D3DCREATE_HARDWARE_VERTEXPROCESSING,
+        DX9->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, Wnd, D3DCREATE_HARDWARE_VERTEXPROCESSING,
                           &presentParams, &Device);
     }
-    ~TDirect3D8Ctx() {
+    ~TDirect3D9Ctx() {
         if (Device) {
             Device->Release();
         }
-        if (DX8) {
-            DX8->Release();
+        if (DX9) {
+            DX9->Release();
         }
     }
     HMODULE GetModule() {
         return Module;
     }
-    LPDIRECT3DDEVICE8 GetDevice() {
+    LPDIRECT3DDEVICE9 GetDevice() {
         return Device;
     }
 private:
     TDummyWindow Wnd;
     HMODULE Module;
-    IDirect3D8* DX8;
-    LPDIRECT3DDEVICE8 Device;
+    IDirect3D9* DX9;
+    LPDIRECT3DDEVICE9 Device;
 };
 
-void GetDX8Offsets(uint64_t& present) {
-    TDirect3D8Ctx dx8;
+
+void GetDX9Offsets(uint64_t& present, uint64_t& presentEx) {
+    TDirect3D9Ctx dx9;
     present = 0;
-    if (dx8.GetModule() && dx8.GetDevice()) {
-        present = GetVtableOffset((uint64_t)dx8.GetModule(), dx8.GetDevice(), 15);
+    presentEx = 0;
+    if (dx9.GetModule() && dx9.GetDevice()) {
+        present = GetVtableOffset((uint64_t)dx9.GetModule(), dx9.GetDevice(), 17);
+        presentEx = GetVtableOffset((uint64_t)dx9.GetModule(), dx9.GetDevice(), 121);
     }
 }
+
+} // NQtScreen

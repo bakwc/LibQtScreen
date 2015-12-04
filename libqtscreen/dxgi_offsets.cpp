@@ -5,6 +5,8 @@
 #include <dxgi.h>
 #include <windows.h>
 
+namespace NQtScreen {
+
 typedef HRESULT (WINAPI *DX10CreateFunc)(IDXGIAdapter*,
                 D3D10_DRIVER_TYPE, HMODULE, UINT, UINT,
                 DXGI_SWAP_CHAIN_DESC*, IDXGISwapChain**, IUnknown**);
@@ -76,3 +78,5 @@ void GetDXGIOffsets(uint64_t& present) {
         present = GetVtableOffset((uint64_t)dgi.GetDxgiModule(), dgi.GetSwapChain(), 8);
     }
 }
+
+} // NQtScreen

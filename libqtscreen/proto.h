@@ -3,11 +3,19 @@
 #include "saveload.h"
 #include <string>
 
+namespace NQtScreen {
+
 enum ECommand {
     CMD_Ping,
     CMD_Info,
     CMD_ScreenShot,
     CMD_Error,
+};
+
+enum EImgByteFormat {
+    BF_R8G8B8A8,
+    BF_B8G8R8A8,
+    BF_R8G8B8,
 };
 
 struct TInjectedAppInfo {
@@ -26,3 +34,5 @@ struct TInjectorHelpInfo {
     SAVELOAD(DX8PresentOffset, DX9PresentOffset,
              DX9PresentExOffset, DXGIPresentOffset)
 };
+
+} // NQtScreen

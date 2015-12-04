@@ -3,6 +3,8 @@
 #include <string>
 #include <windows.h>
 
+namespace NQtScreen {
+
 class TDummyWindow {
 public:
     TDummyWindow(const std::string& caption);
@@ -13,3 +15,5 @@ private:
     std::string Caption;
     HWND Hwnd;
 };
+
+} // NQtScreen

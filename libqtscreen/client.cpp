@@ -1,11 +1,12 @@
 #include "client.h"
-#include "screen.h"
-#include "dxscreen.h"
+#include "screenshot_maker.h"
 
 #include <sstream>
 #include <QBuffer>
 #include <QImage>
 #include <QByteArray>
+
+namespace NQtScreen {
 
 QImage RawDataToQImage(EImgByteFormat fmt,
                         const char* intarray,
@@ -31,8 +32,8 @@ QImage RawDataToQImage(EImgByteFormat fmt,
             }
         }
     } else {
-        for (int j = 0; j < rows; j++) {
-            for (int i = 0; i < columns; i++) {
+        for (size_t j = 0; j < rows; j++) {
+            for (size_t i = 0; i < columns; i++) {
                 int offset = (i + j * columns) * (3 * sizeof(uint8_t));
 
                 uint8_t r = intarray[offset + 0];
@@ -96,7 +97,7 @@ bool TClient::ProcessBuffer() {
     }
     uint32_t packetSize = *(uint32_t*)Buffer.data();
     // todo: check packet size
-    if (Buffer.size() < packetSize + 6) {
+    if ((uint32_t)Buffer.size() < packetSize + 6) {
         return false;
     }
     uint16_t packetType = *(uint16_t*)(Buffer.data() + 4);
@@ -136,3 +137,5 @@ void TClient::Send(ECommand cmd, const QByteArray& data) {
     *(uint16_t*)(packet.data() + 4) = (uint16_t)cmd;
     Sock->write(packet);
 }
+
+} // NQtScreen

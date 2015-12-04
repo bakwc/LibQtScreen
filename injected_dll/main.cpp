@@ -25,7 +25,7 @@ void MainLoop() {
 extern "C"
 {
 
-__declspec (dllexport) BOOL __stdcall DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
+__declspec (dllexport) BOOL __stdcall DllMain(HMODULE, DWORD ul_reason_for_call, LPVOID)
 {
     switch (ul_reason_for_call)
     {

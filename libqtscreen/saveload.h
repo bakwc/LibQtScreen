@@ -8,6 +8,8 @@
 #include <streambuf>
 #include <stdint.h>
 
+namespace NQtScreen {
+
 template<class T>
 class TSerializer {
 public:
@@ -30,12 +32,12 @@ template <class A, class B>
 class TSerializer<std::pair<A, B> > {
 public:
     static void Save(std::ostream& out, const std::pair<A, B>& object) {
-        ::Save(out, object.first);
-        ::Save(out, object.second);
+        NQtScreen::Save(out, object.first);
+        NQtScreen::Save(out, object.second);
     }
     static void Load(std::istream& in, std::pair<A, B>& object) {
-        ::Load(in, object.first);
-        ::Load(in, object.second);
+        NQtScreen::Load(in, object.first);
+        NQtScreen::Load(in, object.second);
     }
 };
 
@@ -46,7 +48,7 @@ public:
         unsigned short size = object.size();
         out.write((const char*)(&size), 2);
         for (const auto& obj: object) {
-            ::Save(out, obj);
+            NQtScreen::Save(out, obj);
         }
     }
 
@@ -56,7 +58,7 @@ public:
         object.clear();
         for (size_t i = 0; i < size; ++i) {
             TObj obj;
-            ::Load(in, obj);
+            NQtScreen::Load(in, obj);
             object.push_back(std::move(obj));
         }
     }
@@ -106,94 +108,94 @@ static inline void Load(std::istream& in, T& t) {
 
 template <class T1>
 static inline void SaveMany(std::ostream& out, const T1& t1) {
-    ::Save(out, t1);
+    NQtScreen::Save(out, t1);
 }
 template <class T1>
 static inline void LoadMany(std::istream& in, T1& t1) {
-    ::Load(in, t1);
+    NQtScreen::Load(in, t1);
 }
 
 template <class T1, class T2>
 static inline void SaveMany(std::ostream& out, const T1& t1, const T2& t2) {
-    ::Save(out, t1);
-    ::Save(out, t2);
+    NQtScreen::Save(out, t1);
+    NQtScreen::Save(out, t2);
 }
 template <class T1, class T2>
 static inline void LoadMany(std::istream& in, T1& t1, T2& t2) {
-    ::Load(in, t1);
-    ::Load(in, t2);
+    NQtScreen::Load(in, t1);
+    NQtScreen::Load(in, t2);
 }
 
 template <class T1, class T2, class T3>
 static inline void SaveMany(std::ostream& out, const T1& t1, const T2& t2, const T3& t3) {
-    ::Save(out, t1);
-    ::Save(out, t2);
-    ::Save(out, t3);
+    NQtScreen::Save(out, t1);
+    NQtScreen::Save(out, t2);
+    NQtScreen::Save(out, t3);
 }
 template <class T1, class T2, class T3>
 static inline void LoadMany(std::istream& in, T1& t1, T2& t2, T3& t3) {
-    ::Load(in, t1);
-    ::Load(in, t2);
-    ::Load(in, t3);
+    NQtScreen::Load(in, t1);
+    NQtScreen::Load(in, t2);
+    NQtScreen::Load(in, t3);
 }
 
 template <class T1, class T2, class T3, class T4>
 static inline void SaveMany(std::ostream& out, const T1& t1, const T2& t2, const T3& t3, const T4& t4) {
-    ::Save(out, t1);
-    ::Save(out, t2);
-    ::Save(out, t3);
-    ::Save(out, t4);
+    NQtScreen::Save(out, t1);
+    NQtScreen::Save(out, t2);
+    NQtScreen::Save(out, t3);
+    NQtScreen::Save(out, t4);
 }
 template <class T1, class T2, class T3, class T4>
 static inline void LoadMany(std::istream& in, T1& t1, T2& t2, T3& t3, T4& t4) {
-    ::Load(in, t1);
-    ::Load(in, t2);
-    ::Load(in, t3);
-    ::Load(in, t4);
+    NQtScreen::Load(in, t1);
+    NQtScreen::Load(in, t2);
+    NQtScreen::Load(in, t3);
+    NQtScreen::Load(in, t4);
 }
 
 template <class T1, class T2, class T3, class T4, class T5>
 static inline void SaveMany(std::ostream& out, const T1& t1, const T2& t2,
                             const T3& t3, const T4& t4, const T5& t5)
 {
-    ::Save(out, t1);
-    ::Save(out, t2);
-    ::Save(out, t3);
-    ::Save(out, t4);
-    ::Save(out, t5);
+    NQtScreen::Save(out, t1);
+    NQtScreen::Save(out, t2);
+    NQtScreen::Save(out, t3);
+    NQtScreen::Save(out, t4);
+    NQtScreen::Save(out, t5);
 }
 template <class T1, class T2, class T3, class T4, class T5>
 static inline void LoadMany(std::istream& in, T1& t1, T2& t2, T3& t3,
                             T4& t4, T5& t5)
 {
-    ::Load(in, t1);
-    ::Load(in, t2);
-    ::Load(in, t3);
-    ::Load(in, t4);
-    ::Load(in, t5);
+    NQtScreen::Load(in, t1);
+    NQtScreen::Load(in, t2);
+    NQtScreen::Load(in, t3);
+    NQtScreen::Load(in, t4);
+    NQtScreen::Load(in, t5);
 }
 
 template <class T1, class T2, class T3, class T4, class T5, class T6>
 static inline void SaveMany(std::ostream& out, const T1& t1, const T2& t2,
                             const T3& t3, const T4& t4, const T5& t5, const T6& t6)
 {
-    ::Save(out, t1);
-    ::Save(out, t2);
-    ::Save(out, t3);
-    ::Save(out, t4);
-    ::Save(out, t5);
-    ::Save(out, t6);
+    NQtScreen::Save(out, t1);
+    NQtScreen::Save(out, t2);
+    NQtScreen::Save(out, t3);
+    NQtScreen::Save(out, t4);
+    NQtScreen::Save(out, t5);
+    NQtScreen::Save(out, t6);
 }
 template <class T1, class T2, class T3, class T4, class T5, class T6>
 static inline void LoadMany(std::istream& in, T1& t1, T2& t2, T3& t3,
                             T4& t4, T5& t5, T6& t6)
 {
-    ::Load(in, t1);
-    ::Load(in, t2);
-    ::Load(in, t3);
-    ::Load(in, t4);
-    ::Load(in, t5);
-    ::Load(in, t6);
+    NQtScreen::Load(in, t1);
+    NQtScreen::Load(in, t2);
+    NQtScreen::Load(in, t3);
+    NQtScreen::Load(in, t4);
+    NQtScreen::Load(in, t5);
+    NQtScreen::Load(in, t6);
 }
 
 template <class T1, class T2, class T3, class T4, class T5, class T6, class T7>
@@ -201,25 +203,25 @@ static inline void SaveMany(std::ostream& out, const T1& t1, const T2& t2,
                             const T3& t3, const T4& t4, const T5& t5, const T6& t6,
                             const T7& t7)
 {
-    ::Save(out, t1);
-    ::Save(out, t2);
-    ::Save(out, t3);
-    ::Save(out, t4);
-    ::Save(out, t5);
-    ::Save(out, t6);
-    ::Save(out, t7);
+    NQtScreen::Save(out, t1);
+    NQtScreen::Save(out, t2);
+    NQtScreen::Save(out, t3);
+    NQtScreen::Save(out, t4);
+    NQtScreen::Save(out, t5);
+    NQtScreen::Save(out, t6);
+    NQtScreen::Save(out, t7);
 }
 template <class T1, class T2, class T3, class T4, class T5, class T6, class T7>
 static inline void LoadMany(std::istream& in, T1& t1, T2& t2, T3& t3,
                             T4& t4, T5& t5, T6& t6, T7& t7)
 {
-    ::Load(in, t1);
-    ::Load(in, t2);
-    ::Load(in, t3);
-    ::Load(in, t4);
-    ::Load(in, t5);
-    ::Load(in, t6);
-    ::Load(in, t7);
+    NQtScreen::Load(in, t1);
+    NQtScreen::Load(in, t2);
+    NQtScreen::Load(in, t3);
+    NQtScreen::Load(in, t4);
+    NQtScreen::Load(in, t5);
+    NQtScreen::Load(in, t6);
+    NQtScreen::Load(in, t7);
 }
 
 template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
@@ -227,27 +229,27 @@ static inline void SaveMany(std::ostream& out, const T1& t1, const T2& t2,
                             const T3& t3, const T4& t4, const T5& t5, const T6& t6,
                             const T7& t7, const T8& t8)
 {
-    ::Save(out, t1);
-    ::Save(out, t2);
-    ::Save(out, t3);
-    ::Save(out, t4);
-    ::Save(out, t5);
-    ::Save(out, t6);
-    ::Save(out, t7);
-    ::Save(out, t8);
+    NQtScreen::Save(out, t1);
+    NQtScreen::Save(out, t2);
+    NQtScreen::Save(out, t3);
+    NQtScreen::Save(out, t4);
+    NQtScreen::Save(out, t5);
+    NQtScreen::Save(out, t6);
+    NQtScreen::Save(out, t7);
+    NQtScreen::Save(out, t8);
 }
 template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
 static inline void LoadMany(std::istream& in, T1& t1, T2& t2, T3& t3,
                             T4& t4, T5& t5, T6& t6, T7& t7, T8& t8)
 {
-    ::Load(in, t1);
-    ::Load(in, t2);
-    ::Load(in, t3);
-    ::Load(in, t4);
-    ::Load(in, t5);
-    ::Load(in, t6);
-    ::Load(in, t7);
-    ::Load(in, t8);
+    NQtScreen::Load(in, t1);
+    NQtScreen::Load(in, t2);
+    NQtScreen::Load(in, t3);
+    NQtScreen::Load(in, t4);
+    NQtScreen::Load(in, t5);
+    NQtScreen::Load(in, t6);
+    NQtScreen::Load(in, t7);
+    NQtScreen::Load(in, t8);
 }
 
 template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
@@ -255,38 +257,38 @@ static inline void SaveMany(std::ostream& out, const T1& t1, const T2& t2,
                             const T3& t3, const T4& t4, const T5& t5, const T6& t6,
                             const T7& t7, const T8& t8, const T9& t9)
 {
-    ::Save(out, t1);
-    ::Save(out, t2);
-    ::Save(out, t3);
-    ::Save(out, t4);
-    ::Save(out, t5);
-    ::Save(out, t6);
-    ::Save(out, t7);
-    ::Save(out, t8);
-    ::Save(out, t9);
+    NQtScreen::Save(out, t1);
+    NQtScreen::Save(out, t2);
+    NQtScreen::Save(out, t3);
+    NQtScreen::Save(out, t4);
+    NQtScreen::Save(out, t5);
+    NQtScreen::Save(out, t6);
+    NQtScreen::Save(out, t7);
+    NQtScreen::Save(out, t8);
+    NQtScreen::Save(out, t9);
 }
 template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 static inline void LoadMany(std::istream& in, T1& t1, T2& t2, T3& t3,
                             T4& t4, T5& t5, T6& t6, T7& t7, T8& t8, T9& t9)
 {
-    ::Load(in, t1);
-    ::Load(in, t2);
-    ::Load(in, t3);
-    ::Load(in, t4);
-    ::Load(in, t5);
-    ::Load(in, t6);
-    ::Load(in, t7);
-    ::Load(in, t8);
-    ::Load(in, t9);
+    NQtScreen::Load(in, t1);
+    NQtScreen::Load(in, t2);
+    NQtScreen::Load(in, t3);
+    NQtScreen::Load(in, t4);
+    NQtScreen::Load(in, t5);
+    NQtScreen::Load(in, t6);
+    NQtScreen::Load(in, t7);
+    NQtScreen::Load(in, t8);
+    NQtScreen::Load(in, t9);
 }
 
 #define SAVELOAD(...) \
     inline virtual void Save(std::ostream& out) const { \
-        ::SaveMany(out, __VA_ARGS__);             \
+        NQtScreen::SaveMany(out, __VA_ARGS__);             \
     } \
  \
     inline virtual void Load(std::istream& in) { \
-        ::LoadMany(in, __VA_ARGS__);             \
+        NQtScreen::LoadMany(in, __VA_ARGS__);             \
     }
 
 
@@ -304,3 +306,5 @@ struct imemstream: virtual membuf, std::istream {
 };
 
 #define SAVELOAD_POD(TypeName) template <> class TSerializer<TypeName>: public TPodSerializer<TypeName> {};
+
+} // NQtScreen

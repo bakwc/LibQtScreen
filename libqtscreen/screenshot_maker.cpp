@@ -1,13 +1,25 @@
-#include "screen.h"
+#include "screenshot_maker.h"
 #include "dxoffsets.h"
 #include "inject.h"
+
+#include <QFileInfo>
 
 #include <windows.h>
 #include <winuser.h>
 
-#include <QDebug>
+namespace NQtScreen {
 
-TScreenShotMaker::TScreenShotMaker() {
+static bool FileExists(const QString& path) {
+    QFileInfo checkFile(path);
+    return checkFile.exists() && checkFile.isFile();
+}
+
+TScreenShotMaker::TScreenShotMaker(const TScreenShotMakerConfig& config)
+    : Config(config)
+    , MakingScreen(false)
+    , FullScreenProcessID(0)
+{
+    Q_ASSERT(FileExists(config.DLL32Path) && "dll does not exist");
     GetDX8Offsets(InjectorHelpInfo.DX8PresentOffset);
     GetDX9Offsets(InjectorHelpInfo.DX9PresentOffset,
                   InjectorHelpInfo.DX9PresentExOffset);
@@ -29,9 +41,6 @@ TScreenShotMaker::TScreenShotMaker() {
             CheckFailedScreens();
         });
     });
-
-    MakingScreen = false;
-    FullScreenProcessID = 0;
 
     connect(&TimeoutTimer, QTimer::timeout, [this] {
         TimeoutTimer.stop();
@@ -68,23 +77,6 @@ void TScreenShotMaker::timerEvent(QTimerEvent*) {
 }
 
 void TScreenShotMaker::InjectAll() {
-    /// For testing purpose - to inject to signle process only.
-    /*
-    int pid = GetProcessID(L"opengl.exe");
-    if (!pid) {
-        return;
-    }
-    static bool inj = false;
-    if (inj) {
-        return;
-    }
-    if (!InjectDll(pid, INJECTED_DLL)) {
-        return;
-    }
-    inj = true;
-    qDebug() << "injected";
-    return;
-    */
     HWND window = GetForegroundWindow();
     if (!window) {
         FullScreenProcessID = 0;
@@ -136,11 +128,10 @@ void TScreenShotMaker::InjectAll() {
         return;
     }
 
-    bool injected = InjectDll(pid, INJECTED_DLL);
+    bool injected = InjectDll(pid, Config.DLL32Path.toStdString());
     if (!injected) {
         return;
     }
-    //qDebug() << "injected";
 }
 
 void TScreenShotMaker::RemoveInactiveConnections() {
@@ -173,3 +164,5 @@ void TScreenShotMaker::CheckFailedScreens() {
         emit OnFailed();
     }
 }
+
+} // NQtScreen

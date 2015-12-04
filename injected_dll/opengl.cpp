@@ -35,7 +35,7 @@ void Screenshot(int x, int y, int w, int h) {
     std::string buffer;
     buffer.resize(w * h * (3 * sizeof(uint8_t)));
     HookCtx->glReadPixels(x, y, w, h, GL_RGB, GL_UNSIGNED_BYTE, &buffer[0]);
-    QByteArray screen = PackImageData(BF_R8G8B8, &buffer[0], h, w);
+    QByteArray screen = PackImageData(NQtScreen::BF_R8G8B8, &buffer[0], h, w);
     HookCtx->Callback(screen);
 }
 

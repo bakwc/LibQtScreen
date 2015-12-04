@@ -7,6 +7,8 @@
 
 #include "proto.h"
 
+namespace NQtScreen {
+
 class TScreenShotMaker;
 class TClient: public QObject {
     Q_OBJECT
@@ -36,3 +38,5 @@ private:
     bool Failed;
 };
 using TClientRef = std::shared_ptr<TClient>;
+
+} // NQtScreen

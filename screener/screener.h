@@ -2,8 +2,8 @@
 
 #include <QCoreApplication>
 #include <memory>
+#include <libqtscreen/screenshot_maker.h>
 
-class TScreenShotMaker;
 class TScreener : public QCoreApplication {
     Q_OBJECT
 public:
@@ -11,5 +11,5 @@ public:
     virtual ~TScreener();
 private:
     void timerEvent(QTimerEvent*);
-    std::unique_ptr<TScreenShotMaker> Screener;
+    std::unique_ptr<NQtScreen::TScreenShotMaker> Screener;
 };

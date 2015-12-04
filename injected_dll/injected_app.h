@@ -1,6 +1,7 @@
 #pragma once
 
-#include <../libdxscreen/proto.h>
+#include "../libqtscreen/proto.h"
+
 #include <QObject>
 #include <QLocalSocket>
 #include <QByteArray>
@@ -16,14 +17,14 @@ private slots:
     void onScreenshotReady(QByteArray img);
 private:
     bool ProcessBuffer();
-    void OnPacketReceived(ECommand cmd, const QByteArray& data);
-    void Send(ECommand cmd, const QByteArray& data);
+    void OnPacketReceived(NQtScreen::ECommand cmd, const QByteArray& data);
+    void Send(NQtScreen::ECommand cmd, const QByteArray& data);
     HMODULE GetSystemModule(const char* module);
     bool MakeScreenshot();
     void timerEvent(QTimerEvent*);
 private:
-    TInjectedAppInfo Info;
-    TInjectorHelpInfo HelpInfo;
+    NQtScreen::TInjectedAppInfo Info;
+    NQtScreen::TInjectorHelpInfo HelpInfo;
     QLocalSocket Sock;
     QByteArray Buffer;
 };

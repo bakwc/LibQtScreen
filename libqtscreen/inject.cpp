@@ -4,6 +4,8 @@
 
 #include "inject.h"
 
+namespace NQtScreen {
+
 int GetProcessID(const std::wstring &exeFileName) {
     HANDLE snapHandle;
     PROCESSENTRY32 processEntry = {0};
@@ -51,3 +53,5 @@ bool InjectDll(int pid, const std::string& dll) {
 
     return true;
 }
+
+} // NQtScreen

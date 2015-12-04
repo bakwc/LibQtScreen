@@ -1,6 +1,5 @@
 #include "injected_app.h"
-
-#include <../libdxscreen/dxscreen.h>
+#include "dxscreen.h"
 
 #include <QProcess>
 #include <sstream>
@@ -26,7 +25,7 @@ TInjectedApp::TInjectedApp() {
 }
 
 void TInjectedApp::onScreenshotReady(QByteArray img) {
-    Send(CMD_ScreenShot, img);
+    Send(NQtScreen::CMD_ScreenShot, img);
 }
 
 bool TInjectedApp::ProcessBuffer() {
@@ -35,31 +34,31 @@ bool TInjectedApp::ProcessBuffer() {
     }
     uint32_t packetSize = *(uint32_t*)Buffer.data();
     // todo: check packet size
-    if (Buffer.size() < packetSize + 6) {
+    if ((uint32_t)Buffer.size() < packetSize + 6u) {
         return false;
     }
     uint16_t packetType = *(uint16_t*)(Buffer.data() + 4);
     QByteArray packetData = QByteArray(Buffer.data() + 6, packetSize);
     Buffer.remove(0, packetSize + 6);
-    OnPacketReceived((ECommand)packetType, packetData);
+    OnPacketReceived((NQtScreen::ECommand)packetType, packetData);
     return true;
 }
 
-void TInjectedApp::OnPacketReceived(ECommand cmd, const QByteArray& data) {
+void TInjectedApp::OnPacketReceived(NQtScreen::ECommand cmd, const QByteArray& data) {
     switch (cmd) {
-    case CMD_Ping: {
-        Send(CMD_Ping, "pong");
+    case NQtScreen::CMD_Ping: {
+        Send(NQtScreen::CMD_Ping, "pong");
     } break;
-    case CMD_Info: {
-        imemstream in(data.data(), data.size());
+    case NQtScreen::CMD_Info: {
+        NQtScreen::imemstream in(data.data(), data.size());
         HelpInfo.Load(in);
         std::stringstream out;
         Info.Save(out);
-        Send(CMD_Info, QByteArray::fromStdString(out.str()));
+        Send(NQtScreen::CMD_Info, QByteArray::fromStdString(out.str()));
     } break;
-    case CMD_ScreenShot: {
+    case NQtScreen::CMD_ScreenShot: {
         if (!MakeScreenshot()) {
-            Send(CMD_Error, "error");
+            Send(NQtScreen::CMD_Error, "error");
         }
     } break;
     default:
@@ -67,7 +66,7 @@ void TInjectedApp::OnPacketReceived(ECommand cmd, const QByteArray& data) {
     }
 }
 
-void TInjectedApp::Send(ECommand cmd, const QByteArray& data) {
+void TInjectedApp::Send(NQtScreen::ECommand cmd, const QByteArray& data) {
     QByteArray packet;
     packet.resize(6);
     packet += data;

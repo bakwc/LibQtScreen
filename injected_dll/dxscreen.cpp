@@ -15,13 +15,13 @@ HMODULE GetSystemModule(const char* module) {
     return GetModuleHandleA(basePath.c_str());
 }
 
-QByteArray PackImageData(EImgByteFormat fmt,
+QByteArray PackImageData(NQtScreen::EImgByteFormat fmt,
                          char* intarray,
                          unsigned rows,
                          unsigned columns)
 {
     QByteArray data;
-    if (fmt == BF_B8G8R8A8 || fmt == BF_R8G8B8A8) {
+    if (fmt == NQtScreen::BF_B8G8R8A8 || fmt == NQtScreen::BF_R8G8B8A8) {
         data.resize(1 + 4 + 4 + rows * columns * 4);
         memcpy(data.data() + 1 + 4 + 4, intarray, rows * columns * 4);
     } else {
