@@ -1,24 +1,22 @@
 #include <windows.h>
-#include <thread>
-#include <iostream>
 
 #include <QEventLoop>
 #include <QCoreApplication>
 
 #include "injected_app.h"
 
-void MainLoop() {
+DWORD WINAPI MainLoop(LPVOID) {
     // Check if this is a Qt application
     if (QCoreApplication::instance()) {
         QEventLoop loop;
         TInjectedApp myApp;
-        loop.exec();
+        return loop.exec();
     } else {
         int argc = 0;
         char** argv = nullptr;
         QCoreApplication loop(argc, argv);
         TInjectedApp myApp;
-        loop.exec();
+        return loop.exec();
     }
 }
 
@@ -30,8 +28,8 @@ __declspec (dllexport) BOOL __stdcall DllMain(HMODULE, DWORD ul_reason_for_call,
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH: {
-        std::thread thread(&MainLoop);
-        thread.detach();
+        DWORD thrID;
+        CreateThread(0, 0, MainLoop, 0, 0, &thrID);
     } break;
     case DLL_THREAD_ATTACH:
         break;

@@ -7,7 +7,14 @@
 #include <windows.h>
 #include <winuser.h>
 
+#include <QDebug>
+
 namespace NQtScreen {
+
+static QString GetFullPath(const QString& path) {
+    QFileInfo checkFile(path);
+    return checkFile.absoluteFilePath();
+}
 
 static bool FileExists(const QString& path) {
     QFileInfo checkFile(path);
@@ -20,6 +27,7 @@ TScreenShotMaker::TScreenShotMaker(const TScreenShotMakerConfig& config)
     , FullScreenProcessID(0)
 {
     Q_ASSERT(FileExists(config.DLL32Path) && "dll does not exist");
+    Q_ASSERT(FileExists(config.DLL64Path) && "dll does not exist");
     GetDX8Offsets(InjectorHelpInfo.DX8PresentOffset);
     GetDX9Offsets(InjectorHelpInfo.DX9PresentOffset,
                   InjectorHelpInfo.DX9PresentExOffset);
@@ -128,10 +136,13 @@ void TScreenShotMaker::InjectAll() {
         return;
     }
 
-    bool injected = InjectDll(pid, Config.DLL32Path.toStdString());
+//    bool injected = InjectDll(pid, GetFullPath(Config.DLL32Path).toStdString());
+    bool injected = InjectDll(pid, GetFullPath(Config.DLL64Path).toStdString());
     if (!injected) {
         return;
     }
+
+    qDebug() << "injected";
 }
 
 void TScreenShotMaker::RemoveInactiveConnections() {
