@@ -1,6 +1,6 @@
 What is LibQtScreen?
 
-  LibQtScreen is a qt library for taking screenshots of 
+  LibQtScreen is a Qt 5 library for taking screenshots of 
   fullscreen DirectX and OpenGL applications.
   
 How does it works?
