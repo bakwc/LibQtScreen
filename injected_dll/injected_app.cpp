@@ -94,6 +94,6 @@ bool TInjectedApp::MakeScreenshot() {
 
 void TInjectedApp::timerEvent(QTimerEvent *) {
     if (Sock.state() == QLocalSocket::UnconnectedState) {
-        Sock.connectToServer("mothership");
+        Sock.connectToServer("libqtscreen");
     }
 }

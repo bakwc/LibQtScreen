@@ -49,7 +49,7 @@ TScreenShotMaker::TScreenShotMaker(const TScreenShotMakerConfig& config)
     });
 
     startTimer(500);
-    Server.listen("mothership");
+    Server.listen("libqtscreen");
 }
 
 void TScreenShotMaker::MakeScreenshot() {

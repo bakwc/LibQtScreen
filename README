@@ -1,0 +1,20 @@
+What is LibQtScreen?
+
+  LibQtScreen is a qt library for taking screenshots of 
+  fullscreen DirectX and OpenGL applications.
+  
+How does it works?
+
+  LibQtScreen injects dll into fullscreen applications.
+  Injected dll intercepts DirectX and OpenGL draw
+  functions, copy rendered frame and returns it back.
+
+How can I use it?
+
+  * copy libqtscreen to your project
+  * add include(libqtscreen/libqtscreen.pri) to your .pro file
+  * use NQtScreen::TScreenShotMaker to make screenshot (see screener example)
+  * you also need libqtscreen32.dll and libqtscreen64.dll.
+    You can build it yourself (injected_dll) or take
+	pre-built dlls (build directory). Put them near your
+	applications executable.
