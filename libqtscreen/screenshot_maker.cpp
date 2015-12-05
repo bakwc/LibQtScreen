@@ -42,7 +42,7 @@ TScreenShotMaker::TScreenShotMaker(const TScreenShotMakerConfig& config)
         });
     });
 
-    connect(&TimeoutTimer, QTimer::timeout, [this] {
+    connect(&TimeoutTimer, &QTimer::timeout, [this] {
         TimeoutTimer.stop();
         MakingScreen = false;
         emit OnFailed();

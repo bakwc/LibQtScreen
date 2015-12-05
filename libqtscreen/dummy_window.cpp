@@ -2,6 +2,8 @@
 
 #include <windows.h>
 
+#pragma comment(lib, "user32.lib")
+
 namespace NQtScreen {
 
 static const char* DUMMY_WINDOW = "dummy_dx_test_cls";

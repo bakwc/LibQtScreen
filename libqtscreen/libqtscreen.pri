@@ -1,5 +1,7 @@
 QT += core network
 
+INCLUDEPATH += $$PWD/directx
+
 HEADERS += $$PWD/inject.h \
     $$PWD/proto.h \
     $$PWD/saveload.h \
