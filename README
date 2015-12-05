@@ -16,5 +16,5 @@ How can I use it?
   * use NQtScreen::TScreenShotMaker to make screenshot (see screener example)
   * you also need libqtscreen32.dll and libqtscreen64.dll.
     You can build it yourself (injected_dll) or take
-	pre-built dlls (build directory). Put them near your
-	applications executable.
+    pre-built dlls (build directory). Put them near your
+    applications executable.
