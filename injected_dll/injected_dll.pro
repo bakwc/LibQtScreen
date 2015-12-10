@@ -6,7 +6,7 @@ QMAKE_CXXFLAGS += -std=c++11
 QT += core network
 QT -= gui widgets
 
-INCLUDEPATH += ../libqtscreen/directx/
+INCLUDEPATH += ../directx_api/
 
 HEADERS += \
     injected_app.h \

@@ -4,11 +4,11 @@
 #include <d3d8.h>
 
 
-struct THookCtx {
+struct THookCtxDX8 {
     void* PresentFun = nullptr;
     TScreenCallback Callback;
 };
-static THookCtx* HookCtx = new THookCtx();
+static THookCtxDX8* HookCtx = new THookCtxDX8();
 
 
 void GetDX8Screenshot(IDirect3DDevice8* device) {

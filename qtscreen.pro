@@ -3,4 +3,4 @@ TEMPLATE = subdirs
 
 CONFIG += ordered
 
-SUBDIRS += injected_dll screener
+SUBDIRS += injected_dll helper screener

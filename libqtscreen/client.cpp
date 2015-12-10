@@ -58,7 +58,7 @@ TClient::TClient(TScreenShotMaker* screener, QLocalSocket* sock)
         }
     });
     std::stringstream out;
-    Screener->InjectorHelpInfo.Save(out);
+    Screener->InjectorHelpInfo32.Save(out);
     Send(CMD_Info, QByteArray::fromStdString(out.str()));
     startTimer(1000);
 }

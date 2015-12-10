@@ -1,15 +1,35 @@
 #include "screenshot_maker.h"
-#include "dxoffsets.h"
-#include "inject.h"
 
 #include <QFileInfo>
+#include <QProcess>
 
 #include <windows.h>
 #include <winuser.h>
 
 #include <QDebug>
 
+#pragma comment(lib, "user32.lib")
+
 namespace NQtScreen {
+
+static bool IsOs64Bit() {
+#if defined(_WIN64)
+    return true;
+#elif defined(_WIN32)
+    BOOL res = false;
+    IsWow64Process(GetCurrentProcess(), &res);
+    return res;
+#else
+    return false;
+#endif
+}
+
+static bool IsProcess64Bit(uint32_t pid) {
+    HANDLE processHandle = OpenProcess(PROCESS_ALL_ACCESS, TRUE, pid);
+    BOOL res = false;
+    IsWow64Process(processHandle, &res);
+    return !res;
+}
 
 static QString GetFullPath(const QString& path) {
     QFileInfo checkFile(path);
@@ -21,17 +41,51 @@ static bool FileExists(const QString& path) {
     return checkFile.exists() && checkFile.isFile();
 }
 
+static void GetOffsets(TInjectorHelpInfo& offsets, const QString& helperExe) {
+    QProcess helper32;
+    QStringList args;
+    args.push_back("offsets");
+    helper32.start(helperExe, args);
+    helper32.waitForStarted();
+    QByteArray data;
+    while (helper32.waitForReadyRead()) {
+        data.append(helper32.readAll());
+    }
+    QList<QByteArray> lines = data.split('\n');
+    offsets.DX8PresentOffset = lines[0].trimmed().toInt();
+    offsets.DX9PresentOffset = lines[1].trimmed().toInt();
+    offsets.DX9PresentExOffset = lines[2].trimmed().toInt();
+    offsets.DXGIPresentOffset = lines[3].trimmed().toInt();
+}
+
+static bool InjectDll(uint32_t processId, const QString& helperExe, const QString& dll) {
+    QProcess helper32;
+    QStringList args;
+    args.push_back("inject");
+    args.push_back(QString::number(processId));
+    args.push_back(dll);
+    helper32.start(helperExe, args);
+    helper32.waitForStarted();
+    QByteArray data;
+    while (helper32.waitForReadyRead()) {
+        data.append(helper32.readAll());
+    }
+    return helper32.exitCode() == 0;
+}
+
 TScreenShotMaker::TScreenShotMaker(const TScreenShotMakerConfig& config)
     : Config(config)
     , MakingScreen(false)
     , FullScreenProcessID(0)
+    , IsOs64(IsOs64Bit())
 {
     Q_ASSERT(FileExists(config.DLL32Path) && "dll does not exist");
     Q_ASSERT(FileExists(config.DLL64Path) && "dll does not exist");
-    GetDX8Offsets(InjectorHelpInfo.DX8PresentOffset);
-    GetDX9Offsets(InjectorHelpInfo.DX9PresentOffset,
-                  InjectorHelpInfo.DX9PresentExOffset);
-    GetDXGIOffsets(InjectorHelpInfo.DXGIPresentOffset);
+    Q_ASSERT(FileExists(config.Helper32Path) && "helper does not exist");
+    Q_ASSERT(FileExists(config.Helper64Path) && "helper does not exist");
+
+    GetOffsets(InjectorHelpInfo32, config.Helper32Path);
+    GetOffsets(InjectorHelpInfo64, config.Helper64Path);
 
     connect(&Server, &QLocalServer::newConnection, [this] {
         Connections.emplace_back(new TClient(this, Server.nextPendingConnection()));
@@ -136,13 +190,16 @@ void TScreenShotMaker::InjectAll() {
         return;
     }
 
-//    bool injected = InjectDll(pid, GetFullPath(Config.DLL32Path).toStdString());
-    bool injected = InjectDll(pid, GetFullPath(Config.DLL64Path).toStdString());
+    bool injected = false;
+    if (IsOs64 && IsProcess64Bit(pid)) {
+        injected = InjectDll(pid, Config.Helper64Path, GetFullPath(Config.DLL64Path));
+    } else {
+        injected = InjectDll(pid, Config.Helper32Path, GetFullPath(Config.DLL32Path));
+    }
+
     if (!injected) {
         return;
     }
-
-    qDebug() << "injected";
 }
 
 void TScreenShotMaker::RemoveInactiveConnections() {

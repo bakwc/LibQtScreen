@@ -8,11 +8,11 @@
 void GetDX10Screenshot(IDXGISwapChain* swapChain, QByteArray& screen);
 void GetDX11Screenshot(IDXGISwapChain* swapChain, QByteArray& screen);
 
-struct THookCtx {
+struct THookCtxDXI {
     void* PresentFun = nullptr;
     TScreenCallback Callback;
 };
-static THookCtx* HookCtx = new THookCtx();
+static THookCtxDXI* HookCtx = new THookCtxDXI();
 
 static HRESULT STDMETHODCALLTYPE HookPresent(IDXGISwapChain* swapChain,
                                              UINT syncInterval, UINT flags)
@@ -36,8 +36,10 @@ bool MakeDXGIScreen(const TScreenCallback& callback,
     if (!dxgiModule) {
         return false;
     }
+    std::cerr << " === Making DXGI Screen\n";
     HookCtx->Callback = callback;
     HookCtx->PresentFun = (void*)((uintptr_t)dxgiModule + (uintptr_t)dxgiOffset);
     Hook(HookCtx->PresentFun, HookPresent);
+    std::cerr << " === HOOKED\n";
     return true;
 }

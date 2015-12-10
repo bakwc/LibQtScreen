@@ -1,20 +1,26 @@
 What is LibQtScreen?
 
-  LibQtScreen is a Qt 5 library for taking screenshots of 
-  fullscreen DirectX and OpenGL applications.
+  LibQtScreen is a Qt 5 library for taking screenshots of fullscreen DirectX
+  and OpenGL applications. It supports DirectX from 8 to 11, OpenGL, win32
+  and win64 applications. It can be compiled with MSVC and MinGW gcc.
   
 How does it works?
 
-  LibQtScreen injects dll into fullscreen applications.
-  Injected dll intercepts DirectX and OpenGL draw
-  functions, copy rendered frame and returns it back.
-
+  LibQtScreen injects dll into fullscreen applications. Injected dll intercepts
+  DirectX and OpenGL draw functions, copy rendered frame and returns it back.
+  
 How can I use it?
 
   * copy libqtscreen to your project
   * add include(libqtscreen/libqtscreen.pri) to your .pro file
   * use NQtScreen::TScreenShotMaker to make screenshot (see screener example)
-  * you also need libqtscreen32.dll and libqtscreen64.dll.
-    You can build it yourself (injected_dll) or take
-    pre-built dlls (build directory). Put them near your
-    applications executable.
+  * you also need helper32.exe, helper64.exe, libqtscreen32.dll and libqtscreen64.dll.
+    You can build it yourself (injected_dll) or take pre-built dlls (build directory).
+	Put them near your applications executable.
+
+Why do I need helper32.exe, helper64.exe, libqtscreen32.dll and libqtscreen64.dll?
+
+  Dll is required to inject code into directx and opengl applications. You need one
+  for 32bit and one for 64bit process. Helper64.exe is required to be able to inject
+  64bit dll into 64bit process from your 32bit compiled program, and helper32.exe is
+  required to inject 32bit dll into 32bit process from your 64bit compiled program.

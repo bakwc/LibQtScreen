@@ -4,6 +4,8 @@
 #include <d3d9.h>
 #include <windows.h>
 
+#include <iostream>
+
 namespace NQtScreen {
 
 typedef IDirect3D9 *(WINAPI *DX9CreateFunc)(UINT);

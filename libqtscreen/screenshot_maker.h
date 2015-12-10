@@ -17,6 +17,12 @@ struct TScreenShotMakerConfig {
     // Path to x64 dll
     QString DLL64Path = "libqtscreen64.dll";
 
+    // Path to x86 helper binary
+    QString Helper32Path = "helper32.exe";
+
+    // Path to x64 helper binary
+    QString Helper64Path = "helper64.exe";
+
     // Time to wait for screenshot, milliseconds.
     // OnFailed will be emmited after timeout expire.
     int Timeout = 300;
@@ -43,10 +49,12 @@ private:
     QLocalServer Server;
     std::vector<TClientRef> Connections;
     std::set<uint32_t> InjectedPIDs;
-    TInjectorHelpInfo InjectorHelpInfo;
+    TInjectorHelpInfo InjectorHelpInfo32;
+    TInjectorHelpInfo InjectorHelpInfo64;
     QTimer TimeoutTimer;
     bool MakingScreen;
     uint32_t FullScreenProcessID;
+    bool IsOs64;
 };
 
 } // NQtScreen

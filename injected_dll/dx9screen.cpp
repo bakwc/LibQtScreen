@@ -3,13 +3,15 @@
 
 #include <d3d9.h>
 
+#include <iostream>
 
-struct THookCtx {
+
+struct THookCtxDX9 {
     void* PresentFun = nullptr;
     void* PresentExFun = nullptr;
     TScreenCallback Callback;
 };
-static THookCtx* HookCtx = new THookCtx();
+static THookCtxDX9* HookCtx = new THookCtxDX9();
 
 void GetDX9Screenshot(IDirect3DDevice9* device) {
     HRESULT hr;
@@ -81,11 +83,11 @@ bool MakeDX9Screen(const TScreenCallback& callback,
     if (!dx9module) {
         return false;
     }
-
     HookCtx->Callback = callback;
     HookCtx->PresentFun = (void*)((uintptr_t)dx9module + (uintptr_t)presentOffset);
     Hook(HookCtx->PresentFun, HookPresent);
     HookCtx->PresentExFun = (void*)((uintptr_t)dx9module + (uintptr_t)presentExOffset);
     Hook(HookCtx->PresentFun, HookPresentEx);
+
     return true;
 }

@@ -1,19 +1,11 @@
 QT += core network
 
-INCLUDEPATH += $$PWD/directx
-
-HEADERS += $$PWD/inject.h \
+HEADERS += \
     $$PWD/proto.h \
     $$PWD/saveload.h \
-    $$PWD/dummy_window.h \
-    $$PWD/dxoffsets.h \
     $$PWD/client.h \
     $$PWD/screenshot_maker.h
 
-SOURCES += $$PWD/inject.cpp \
-    $$PWD/dummy_window.cpp \
-    $$PWD/dx8offsets.cpp \
-    $$PWD/dx9offsets.cpp \
-    $$PWD/dxgi_offsets.cpp \
+SOURCES += \
     $$PWD/client.cpp \
     $$PWD/screenshot_maker.cpp

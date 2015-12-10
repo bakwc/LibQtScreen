@@ -5,6 +5,8 @@
 #include <map>
 #include <string>
 
+#include <iostream>
+
 static std::map<uint64_t, std::string> OldData;
 
 
@@ -12,7 +14,6 @@ bool DoHook(void *addr,void *handler) {
     if (OldData.find((uint64_t)addr) != OldData.end()) {
         return false;
     }
-
     if (addr != nullptr && handler != nullptr) {
         DWORD old;
         if (VirtualProtect(addr, 32, PAGE_EXECUTE_READWRITE, &old) != FALSE) {
@@ -24,8 +25,8 @@ bool DoHook(void *addr,void *handler) {
             *(BYTE*)&code[0] = 0xE9;
             *(int*)&code[1] = (BYTE*)handler - ((BYTE*)addr + 5);
 #else
-            oldData.resize(11);
-            memcpy(&oldData[0], (BYTE*)addr, 11);
+            oldData.resize(12);
+            memcpy(&oldData[0], (BYTE*)addr, 12);
             *(WORD*)&code[0] = 0xB848;
             *(void**)&code[2] = handler;
             *(WORD*)&code[10] = 0xE0FF;
@@ -52,9 +53,9 @@ void DoUnHook(void *func) {
     VirtualProtect(origFunc, 5, prevProtect, &prevProtect);
 #else
     DWORD prevProtect;
-    VirtualProtect(origFunc, 11, PAGE_EXECUTE_READWRITE, &prevProtect);
-    memcpy(origFunc, &oldData[0], 11);
-    VirtualProtect(origFunc, 11, prevProtect, &prevProtect);
+    VirtualProtect(origFunc, 12, PAGE_EXECUTE_READWRITE, &prevProtect);
+    memcpy(origFunc, &oldData[0], 12);
+    VirtualProtect(origFunc, 12, prevProtect, &prevProtect);
 #endif
     OldData.erase((uint64_t)origFunc);
 }

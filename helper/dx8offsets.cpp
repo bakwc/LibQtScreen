@@ -2,6 +2,7 @@
 #include "dummy_window.h"
 
 #include <d3d8.h>
+#include <dxerr8.h>
 #include <windows.h>
 
 namespace NQtScreen {
@@ -19,6 +20,7 @@ public:
         if (!Wnd) {
             return;
         }
+
         Module = LoadLibraryA("d3d8.dll");
         if (!Module) {
             return;
@@ -41,8 +43,9 @@ public:
         presentParams.hDeviceWindow = NULL;
         presentParams.hDeviceWindow = Wnd;
 
-        DX8->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, Wnd, D3DCREATE_HARDWARE_VERTEXPROCESSING,
+        HRESULT hr = DX8->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, Wnd, D3DCREATE_HARDWARE_VERTEXPROCESSING,
                           &presentParams, &Device);
+
     }
     ~TDirect3D8Ctx() {
         if (Device) {

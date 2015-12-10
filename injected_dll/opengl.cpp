@@ -16,7 +16,7 @@ typedef void (APIENTRY *glReadPixels_t)(GLint x, GLint y, GLsizei width,
                                         GLsizei height, GLenum format,
                                         GLenum type, GLvoid *pixels);
 
-struct THookCtx {
+struct THookCtxGL {
     glBegin_t glBeginFunc = nullptr;
     glEnd_t glEndFunc = nullptr;
     glGetIntegerv_t glGetIntegerv = nullptr;
@@ -25,7 +25,7 @@ struct THookCtx {
     glReadPixels_t glReadPixels = nullptr;
     TScreenCallback Callback;
 };
-static THookCtx* HookCtx = new THookCtx();
+static THookCtxGL* HookCtx = new THookCtxGL();
 
 
 void Screenshot(int x, int y, int w, int h) {

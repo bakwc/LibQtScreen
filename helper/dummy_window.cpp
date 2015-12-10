@@ -41,6 +41,7 @@ static bool RegisterDummyWindow() {
 
 TDummyWindow::TDummyWindow(const std::string& caption)
     : Caption(caption)
+    , Hwnd(0)
 {
     if (!RegisterDummyWindow()) {
         return;
