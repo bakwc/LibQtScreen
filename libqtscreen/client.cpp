@@ -57,9 +57,6 @@ TClient::TClient(TScreenShotMaker* screener, QLocalSocket* sock)
         while (ProcessBuffer()) {
         }
     });
-    std::stringstream out;
-    Screener->InjectorHelpInfo32.Save(out);
-    Send(CMD_Info, QByteArray::fromStdString(out.str()));
     startTimer(1000);
 }
 
@@ -114,6 +111,13 @@ void TClient::OnPacketReceived(ECommand cmd, const QByteArray& data) {
     case CMD_Info: {
         imemstream in(data.data(), data.size());
         Info.Load(in);
+        std::stringstream out;
+        if (Info.Is64Bit) {
+            Screener->InjectorHelpInfo64.Save(out);
+        } else {
+            Screener->InjectorHelpInfo32.Save(out);
+        }
+        Send(CMD_Info, QByteArray::fromStdString(out.str()));
     } break;
     case CMD_ScreenShot: {
         EImgByteFormat fmt = (EImgByteFormat)data[0];

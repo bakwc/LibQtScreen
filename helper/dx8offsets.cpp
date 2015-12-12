@@ -2,7 +2,6 @@
 #include "dummy_window.h"
 
 #include <d3d8.h>
-#include <dxerr8.h>
 #include <windows.h>
 
 namespace NQtScreen {

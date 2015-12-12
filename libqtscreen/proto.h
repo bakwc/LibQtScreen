@@ -21,8 +21,9 @@ enum EImgByteFormat {
 struct TInjectedAppInfo {
     uint32_t PID = 0;
     std::string Name;
+    bool Is64Bit = false;
 
-    SAVELOAD(PID, Name)
+    SAVELOAD(PID, Name, Is64Bit)
 };
 
 struct TInjectorHelpInfo {

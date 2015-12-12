@@ -20,6 +20,7 @@ TInjectedApp::TInjectedApp() {
 
     Info.PID = QCoreApplication::instance()->applicationPid();
     Info.Name = QCoreApplication::instance()->applicationFilePath().toStdString();
+    Info.Is64Bit = sizeof(void*) == 8;
 
     startTimer(500);
 }
@@ -52,9 +53,6 @@ void TInjectedApp::OnPacketReceived(NQtScreen::ECommand cmd, const QByteArray& d
     case NQtScreen::CMD_Info: {
         NQtScreen::imemstream in(data.data(), data.size());
         HelpInfo.Load(in);
-        std::stringstream out;
-        Info.Save(out);
-        Send(NQtScreen::CMD_Info, QByteArray::fromStdString(out.str()));
     } break;
     case NQtScreen::CMD_ScreenShot: {
         if (!MakeScreenshot()) {
@@ -95,5 +93,8 @@ bool TInjectedApp::MakeScreenshot() {
 void TInjectedApp::timerEvent(QTimerEvent *) {
     if (Sock.state() == QLocalSocket::UnconnectedState) {
         Sock.connectToServer("libqtscreen");
+        std::stringstream out;
+        Info.Save(out);
+        Send(NQtScreen::CMD_Info, QByteArray::fromStdString(out.str()));
     }
 }
