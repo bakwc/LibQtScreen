@@ -2,6 +2,7 @@
 #include "hook.h"
 
 #include <d3d8.h>
+#include <d3d8types.h>
 
 
 struct THookCtxDX8 {
@@ -45,7 +46,7 @@ void GetDX8Screenshot(IDirect3DDevice8* device) {
         return;
     }
 
-    QByteArray screen = PackImageData(NQtScreen::BF_R8G8B8A8, (char*)rect.pBits, desc.Height, desc.Width);
+    QByteArray screen = PackImageData(NQtScreen::BF_B8G8R8A8, (char*)rect.pBits, desc.Height, desc.Width);
     HookCtx->Callback(screen);
 
     buffer->Release();

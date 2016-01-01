@@ -196,10 +196,6 @@ void TScreenShotMaker::InjectAll() {
     } else {
         injected = InjectDll(pid, Config.Helper32Path, GetFullPath(Config.DLL32Path));
     }
-
-    if (!injected) {
-        return;
-    }
 }
 
 void TScreenShotMaker::RemoveInactiveConnections() {

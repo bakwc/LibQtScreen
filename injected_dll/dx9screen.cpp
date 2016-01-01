@@ -48,7 +48,14 @@ void GetDX9Screenshot(IDirect3DDevice9* device) {
         return;
     }
 
-    QByteArray screen = PackImageData(NQtScreen::BF_R8G8B8A8, (char*)rect.pBits, desc.Height, desc.Width);
+    NQtScreen::EImgByteFormat fmt = NQtScreen::BF_B8G8R8A8;
+    if (desc.Format == D3DFMT_A8B8G8R8 ||
+        desc.Format == D3DFMT_X8B8G8R8)
+    {
+        fmt = NQtScreen::BF_R8G8B8A8;
+    }
+
+    QByteArray screen = PackImageData(fmt, (char*)rect.pBits, desc.Height, desc.Width);
     HookCtx->Callback(screen);
 
     buffer->Release();
