@@ -2,6 +2,7 @@
 
 #include <QFileInfo>
 #include <QProcess>
+#include <exception>
 
 #include <windows.h>
 #include <winuser.h>
@@ -79,10 +80,17 @@ TScreenShotMaker::TScreenShotMaker(const TScreenShotMakerConfig& config)
     , FullScreenProcessID(0)
     , IsOs64(IsOs64Bit())
 {
-    Q_ASSERT(FileExists(config.DLL32Path) && "dll does not exist");
-    Q_ASSERT(FileExists(config.DLL64Path) && "dll does not exist");
-    Q_ASSERT(FileExists(config.Helper32Path) && "helper does not exist");
-    Q_ASSERT(FileExists(config.Helper64Path) && "helper does not exist");
+    if (!FileExists(config.DLL32Path) ||
+        !FileExists(config.DLL64Path))
+    {
+        throw std::runtime_error("libqtscreen32.dll or libqtscreen64.dll not found");
+    }
+
+    if (!FileExists(config.Helper32Path) ||
+        !FileExists(config.Helper64Path))
+    {
+        throw std::runtime_error("helper32.exe or helper64.exe not found");
+    }
 
     GetOffsets(InjectorHelpInfo32, config.Helper32Path);
     GetOffsets(InjectorHelpInfo64, config.Helper64Path);
