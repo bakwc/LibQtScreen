@@ -26,6 +26,10 @@ struct TScreenShotMakerConfig {
     // Time to wait for screenshot, milliseconds.
     // OnFailed will be emmited after timeout expire.
     int Timeout = 300;
+
+    // Disable if you don't want to inject automatically.
+    // In this case you should inject yourself using InjectToPID.
+    bool AutoInjectToFullscreen = true;
 };
 
 class TScreenShotMaker: public QObject {

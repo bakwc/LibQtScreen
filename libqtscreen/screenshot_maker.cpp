@@ -158,7 +158,9 @@ bool TScreenShotMaker::InjectToPID(uint64_t PID) {
 
 void TScreenShotMaker::timerEvent(QTimerEvent*) {
     RemoveInactiveConnections();
-    InjectAll();
+    if (Config.AutoInjectToFullscreen) {
+        InjectAll();
+    }
 }
 
 void TScreenShotMaker::InjectAll() {
