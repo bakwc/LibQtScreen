@@ -142,6 +142,20 @@ QImage TScreenShotMaker::GetLastScreenshot() {
     return LastScreenshot;
 }
 
+bool TScreenShotMaker::InjectToPID(uint64_t PID) {
+    if (InjectedPIDs.find(PID) != InjectedPIDs.end()) {
+        return true;
+    }
+
+    bool injected = false;
+    if (IsOs64 && IsProcess64Bit(PID)) {
+        injected = InjectDll(PID, Config.Helper64Path, GetFullPath(Config.DLL64Path));
+    } else {
+        injected = InjectDll(PID, Config.Helper32Path, GetFullPath(Config.DLL32Path));
+    }
+    return injected;
+}
+
 void TScreenShotMaker::timerEvent(QTimerEvent*) {
     RemoveInactiveConnections();
     InjectAll();
@@ -195,16 +209,7 @@ void TScreenShotMaker::InjectAll() {
 
     FullScreenProcessID = pid;
 
-    if (InjectedPIDs.find(uint64_t(pid)) != InjectedPIDs.end()) {
-        return;
-    }
-
-    bool injected = false;
-    if (IsOs64 && IsProcess64Bit(pid)) {
-        injected = InjectDll(pid, Config.Helper64Path, GetFullPath(Config.DLL64Path));
-    } else {
-        injected = InjectDll(pid, Config.Helper32Path, GetFullPath(Config.DLL32Path));
-    }
+    InjectToPID(pid);
 }
 
 void TScreenShotMaker::RemoveInactiveConnections() {

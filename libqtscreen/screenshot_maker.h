@@ -35,6 +35,9 @@ public:
     TScreenShotMaker(const TScreenShotMakerConfig& config = TScreenShotMakerConfig());
     void MakeScreenshot();
     QImage GetLastScreenshot();
+
+    // Use it if you want to capture some non-fullscreen applications
+    bool InjectToPID(uint64_t PID);
 signals:
     void OnScreenshotReady();
     void OnFailed();
