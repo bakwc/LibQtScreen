@@ -7,8 +7,6 @@
 #include <windows.h>
 #include <winuser.h>
 
-#include <QDebug>
-
 #pragma comment(lib, "user32.lib")
 
 namespace NQtScreen {

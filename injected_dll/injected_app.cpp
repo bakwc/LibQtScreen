@@ -13,6 +13,12 @@ TInjectedApp::TInjectedApp() {
         }
     });
 
+    connect(&Sock, &QLocalSocket::connected, [this] {
+        std::stringstream out;
+        Info.Save(out);
+        Send(NQtScreen::CMD_Info, QByteArray::fromStdString(out.str()));
+    });
+
     // Required to pass screenshot from directX thread to our thread.
     connect(this, &TInjectedApp::onScreenshotReadySignal,
             this, &TInjectedApp::onScreenshotReady,
@@ -93,8 +99,5 @@ bool TInjectedApp::MakeScreenshot() {
 void TInjectedApp::timerEvent(QTimerEvent *) {
     if (Sock.state() == QLocalSocket::UnconnectedState) {
         Sock.connectToServer("libqtscreen");
-        std::stringstream out;
-        Info.Save(out);
-        Send(NQtScreen::CMD_Info, QByteArray::fromStdString(out.str()));
     }
 }
