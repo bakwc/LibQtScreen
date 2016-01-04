@@ -51,6 +51,9 @@ static void GetOffsets(TInjectorHelpInfo& offsets, const QString& helperExe) {
         data.append(helper32.readAll());
     }
     QList<QByteArray> lines = data.split('\n');
+    if (lines.size() < 4) {
+        throw std::runtime_error("wrong helper output");
+    }
     offsets.DX8PresentOffset = lines[0].trimmed().toInt();
     offsets.DX9PresentOffset = lines[1].trimmed().toInt();
     offsets.DX9PresentExOffset = lines[2].trimmed().toInt();
