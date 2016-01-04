@@ -120,6 +120,7 @@ TScreenShotMaker::TScreenShotMaker(const TScreenShotMakerConfig& config)
     });
 
     startTimer(500);
+    Server.setSocketOptions(QLocalServer::WorldAccessOption);
     Server.listen("libqtscreen");
 }
 
