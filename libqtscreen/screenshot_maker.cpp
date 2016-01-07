@@ -79,6 +79,7 @@ TScreenShotMaker::TScreenShotMaker(const TScreenShotMakerConfig& config)
     : Config(config)
     , MakingScreen(false)
     , FullScreenProcessID(0)
+    , ProcessDetectedCounter(0)
     , IsOs64(IsOs64Bit())
 {
     if (!FileExists(config.DLL32Path) ||
@@ -210,9 +211,21 @@ void TScreenShotMaker::InjectAll() {
         return;
     }
 
+    if (pid != FullScreenProcessID) {
+        ProcessDetectedCounter = 0;
+    }
+
     FullScreenProcessID = pid;
 
-    InjectToPID(pid);
+    ProcessDetectedCounter += 1;
+
+    //   Give some time to process to initialize
+    // and to connect to ourselv if we already injected
+    if (ProcessDetectedCounter > 3) {
+        InjectToPID(pid);
+        // Next inject retry in 30 seconds
+        ProcessDetectedCounter = -60;
+    }
 }
 
 void TScreenShotMaker::RemoveInactiveConnections() {

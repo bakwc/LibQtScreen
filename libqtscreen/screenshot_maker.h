@@ -61,6 +61,7 @@ private:
     QTimer TimeoutTimer;
     bool MakingScreen;
     uint32_t FullScreenProcessID;
+    int32_t ProcessDetectedCounter;
     bool IsOs64;
 };
 
