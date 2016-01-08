@@ -11,5 +11,6 @@ public:
     virtual ~TScreener();
 private:
     void timerEvent(QTimerEvent*);
+    QTextStream Out;
     std::unique_ptr<NQtScreen::TScreenShotMaker> Screener;
 };

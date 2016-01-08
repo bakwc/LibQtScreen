@@ -2,7 +2,8 @@
 
 #include <QFileInfo>
 #include <QProcess>
-#include <exception>
+#include <QDate>
+#include <QTime>
 
 #include <windows.h>
 #include <winuser.h>
@@ -40,24 +41,34 @@ static bool FileExists(const QString& path) {
     return checkFile.exists() && checkFile.isFile();
 }
 
-static void GetOffsets(TInjectorHelpInfo& offsets, const QString& helperExe) {
+bool TScreenShotMaker::GetOffsets(TInjectorHelpInfo& offsets, const QString& helperExe) {
     QProcess helper32;
     QStringList args;
     args.push_back("offsets");
     helper32.start(helperExe, args);
-    helper32.waitForStarted();
+    if (!helper32.waitForStarted()) {
+        WriteLog(LL_Error, "failed to execute helper " + helperExe);
+        return false;
+    }
     QByteArray data;
     while (helper32.waitForReadyRead()) {
         data.append(helper32.readAll());
     }
     QList<QByteArray> lines = data.split('\n');
     if (lines.size() < 4) {
-        throw std::runtime_error("wrong helper output");
+        WriteLog(LL_Error, "wrong output for helper " + helperExe);
+        return false;
     }
     offsets.DX8PresentOffset = lines[0].trimmed().toInt();
     offsets.DX9PresentOffset = lines[1].trimmed().toInt();
     offsets.DX9PresentExOffset = lines[2].trimmed().toInt();
     offsets.DXGIPresentOffset = lines[3].trimmed().toInt();
+    WriteLog(LL_Info, "offsets for " + helperExe);
+    WriteLog(LL_Info, QString("DX8PresentOffset: %1").arg(offsets.DX8PresentOffset));
+    WriteLog(LL_Info, QString("DX9PresentOffset: %1").arg(offsets.DX9PresentOffset));
+    WriteLog(LL_Info, QString("DX9PresentExOffset: %1").arg(offsets.DX9PresentExOffset));
+    WriteLog(LL_Info, QString("DXGIPresentOffset: %1").arg(offsets.DXGIPresentOffset));
+    return true;
 }
 
 static bool InjectDll(uint32_t processId, const QString& helperExe, const QString& dll) {
@@ -82,20 +93,29 @@ TScreenShotMaker::TScreenShotMaker(const TScreenShotMakerConfig& config)
     , ProcessDetectedCounter(0)
     , IsOs64(IsOs64Bit())
 {
+    Initialized = false;
+    WriteLog(LL_Info, "Starting LibQtScreen");
     if (!FileExists(config.DLL32Path) ||
         !FileExists(config.DLL64Path))
     {
-        throw std::runtime_error("libqtscreen32.dll or libqtscreen64.dll not found");
+        WriteLog(LL_Error, "libqtscreen32.dll or libqtscreen64.dll not found");
+        return;
     }
 
     if (!FileExists(config.Helper32Path) ||
         !FileExists(config.Helper64Path))
     {
-        throw std::runtime_error("helper32.exe or helper64.exe not found");
+        WriteLog(LL_Error, "helper32.exe or helper64.exe not found");
+        return;
     }
 
-    GetOffsets(InjectorHelpInfo32, config.Helper32Path);
-    GetOffsets(InjectorHelpInfo64, config.Helper64Path);
+    if (!GetOffsets(InjectorHelpInfo32, config.Helper32Path)) {
+        return;
+    }
+
+    if (!GetOffsets(InjectorHelpInfo64, config.Helper64Path)) {
+        return;
+    }
 
     connect(&Server, &QLocalServer::newConnection, [this] {
         Connections.emplace_back(new TClient(this, Server.nextPendingConnection()));
@@ -120,24 +140,51 @@ TScreenShotMaker::TScreenShotMaker(const TScreenShotMakerConfig& config)
         emit OnFailed();
     });
 
-    startTimer(500);
     Server.setSocketOptions(QLocalServer::WorldAccessOption);
-    Server.listen("libqtscreen");
+    if (!Server.listen("libqtscreen")) {
+        WriteLog(LL_Error, "failed to listen named pipe libqtscreen - may be there is another libqtscreen server");
+        return;
+    }
+    Initialized = true;
+    WriteLog(LL_Info, "Successfuly initialized!");
+    startTimer(500);
 }
 
-void TScreenShotMaker::MakeScreenshot() {
-    if (Connections.size() == 0 || FullScreenProcessID == 0) {
+bool TScreenShotMaker::IsInitialized() const {
+    return Initialized;
+}
+
+void TScreenShotMaker::MakeScreenshot(uint64_t pid) {
+    if (!Initialized) {
+        WriteLog(LL_Warning, "failed to make screenshot: not initialized");
+        emit OnFailed();
+        return;
+    }
+
+    if (Connections.size() == 0) {
+        WriteLog(LL_Warning, "failed to make screenshot: missing any connected dll");
+        emit OnFailed();
+        return;
+    }
+
+    if (!FullScreenProcessID && !pid) {
+        WriteLog(LL_Warning, "failed to make screenshot: no fullscreen app detected");
         emit OnFailed();
         return;
     }
     for (auto&& cli: Connections) {
-        if (cli->GetInfo().PID == FullScreenProcessID) {
+        if (cli->GetInfo().PID == FullScreenProcessID ||
+            cli->GetInfo().PID == pid)
+        {
             MakingScreen = true;
             TimeoutTimer.start(1000);
+            WriteLog(LL_Info, QString("making screenshot of process %1").arg(cli->GetInfo().PID));
             cli->MakeScreenshot();
-            break;
+            return;
         }
     }
+    WriteLog(LL_Warning, "failed to make screenshot: missing connection to required process");
+    emit OnFailed();
 }
 
 QImage TScreenShotMaker::GetLastScreenshot() {
@@ -146,6 +193,7 @@ QImage TScreenShotMaker::GetLastScreenshot() {
 
 bool TScreenShotMaker::InjectToPID(uint64_t PID) {
     if (InjectedPIDs.find(PID) != InjectedPIDs.end()) {
+        WriteLog(LL_Info, QString("already injected to %1").arg(PID));
         return true;
     }
 
@@ -154,6 +202,11 @@ bool TScreenShotMaker::InjectToPID(uint64_t PID) {
         injected = InjectDll(PID, Config.Helper64Path, GetFullPath(Config.DLL64Path));
     } else {
         injected = InjectDll(PID, Config.Helper32Path, GetFullPath(Config.DLL32Path));
+    }
+    if (injected) {
+        WriteLog(LL_Info, QString("successfully injected to %1").arg(PID));
+    } else {
+        WriteLog(LL_Warning, QString("failed to inject to %1").arg(PID));
     }
     return injected;
 }
@@ -257,6 +310,29 @@ void TScreenShotMaker::CheckFailedScreens() {
         TimeoutTimer.stop();
         emit OnFailed();
     }
+}
+
+void TScreenShotMaker::WriteLog(ELogLevel logLevel, const QString& message) {
+    if (!Config.LogOutput || logLevel < Config.LogLevel) {
+        return;
+    }
+    QString level;
+    switch (logLevel) {
+    case LL_Info:
+        level = "INFO";
+        break;
+    case LL_Warning:
+        level = "WARNING";
+        break;
+    case LL_Error:
+        level = "ERROR";
+        break;
+    default:
+        break;
+    }
+    QString msg = "[" + QDate::currentDate().toString("dd.MM.yy") + " " + QTime::currentTime().toString() + " " + level + "] " + message;
+    (*Config.LogOutput) << msg << "\n";
+    Config.LogOutput->flush();
 }
 
 } // NQtScreen

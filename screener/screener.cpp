@@ -4,8 +4,12 @@
 
 TScreener::TScreener(int &argc, char **argv)
     : QCoreApplication(argc, argv)
+    , Out(stderr, QIODevice::WriteOnly)
 {
-    Screener.reset(new NQtScreen::TScreenShotMaker());
+    NQtScreen::TScreenShotMakerConfig config;
+    config.LogOutput = &Out;
+
+    Screener.reset(new NQtScreen::TScreenShotMaker(config));
     startTimer(1000);
     connect(Screener.get(), &NQtScreen::TScreenShotMaker::OnScreenshotReady, [this] {
         QImage screenShot = Screener->GetLastScreenshot();

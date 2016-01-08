@@ -5,6 +5,12 @@
 
 namespace NQtScreen {
 
+enum ELogLevel {
+    LL_Info,
+    LL_Warning,
+    LL_Error,
+};
+
 enum ECommand {
     CMD_Ping,
     CMD_Info,

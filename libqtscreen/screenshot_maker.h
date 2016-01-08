@@ -5,6 +5,7 @@
 #include <QImage>
 #include <QLocalServer>
 #include <QString>
+#include <QTextStream>
 #include <vector>
 #include <set>
 
@@ -30,6 +31,12 @@ struct TScreenShotMakerConfig {
     // Disable if you don't want to inject automatically.
     // In this case you should inject yourself using InjectToPID.
     bool AutoInjectToFullscreen = true;
+
+    // Enable logs. Pass stdout or file stream pointer.
+    QTextStream* LogOutput = nullptr;
+
+    // Select log level.
+    ELogLevel LogLevel = LL_Info;
 };
 
 class TScreenShotMaker: public QObject {
@@ -37,7 +44,18 @@ class TScreenShotMaker: public QObject {
     friend class TClient;
 public:
     TScreenShotMaker(const TScreenShotMakerConfig& config = TScreenShotMakerConfig());
-    void MakeScreenshot();
+
+    // Returns False in case of initialization issues.
+    // Enable logs to see detailed information.
+    bool IsInitialized() const;
+
+    // Async request to make screenshot. Singals OnScreenshotReady
+    // or OnFailed emitted wher ready (or fail).
+    // pid (optional) - custom pid (for non-fullscreen apps), use InjectToPID before.
+    void MakeScreenshot(uint64_t pid = 0);
+
+    // Returns last successful screenshot. Use it to extract
+    // screenshot when OnScreenshotReady emitted.
     QImage GetLastScreenshot();
 
     // Use it if you want to capture some non-fullscreen applications
@@ -50,6 +68,8 @@ private:
     void InjectAll();
     void RemoveInactiveConnections();
     void CheckFailedScreens();
+    bool GetOffsets(TInjectorHelpInfo& offsets, const QString& helperExe);
+    void WriteLog(ELogLevel logLevel, const QString& message);
 private:
     TScreenShotMakerConfig Config;
     QImage LastScreenshot;
@@ -63,6 +83,7 @@ private:
     uint32_t FullScreenProcessID;
     int32_t ProcessDetectedCounter;
     bool IsOs64;
+    bool Initialized;
 };
 
 } // NQtScreen
