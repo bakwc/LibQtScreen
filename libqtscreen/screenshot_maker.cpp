@@ -118,15 +118,18 @@ TScreenShotMaker::TScreenShotMaker(const TScreenShotMakerConfig& config)
     }
 
     connect(&Server, &QLocalServer::newConnection, [this] {
+        WriteLog(LL_Info, "new connection");
         Connections.emplace_back(new TClient(this, Server.nextPendingConnection()));
         TClient* client = Connections.back().get();
         connect(client, &TClient::OnScreenshotReady, [this, client] {
             if (!MakingScreen) {
+                WriteLog(LL_Warning, "screenshot received after timeout");
                 return;
             }
             LastScreenshot = client->GetLastScreenshot();
             MakingScreen = false;
             TimeoutTimer.stop();
+            WriteLog(LL_Info, "screenshot successful");
             emit OnScreenshotReady();
         });
         connect(client, &TClient::OnFailed, [this] {
@@ -137,6 +140,7 @@ TScreenShotMaker::TScreenShotMaker(const TScreenShotMakerConfig& config)
     connect(&TimeoutTimer, &QTimer::timeout, [this] {
         TimeoutTimer.stop();
         MakingScreen = false;
+        WriteLog(LL_Warning, "failed to make screenshot: time out");
         emit OnFailed();
     });
 
@@ -283,13 +287,19 @@ void TScreenShotMaker::InjectAll() {
 
 void TScreenShotMaker::RemoveInactiveConnections() {
     std::vector<TClientRef> newConnections;
-    InjectedPIDs.clear();
+    std::set<uint32_t> prevPids;
+    InjectedPIDs.swap(prevPids);
     for (auto&& c: Connections) {
         if (c->IsActive()) {
             newConnections.push_back(c);
             if (c->GetInfo().PID) {
+                if (prevPids.find(c->GetInfo().PID) == prevPids.end()) {
+                    WriteLog(LL_Info, QString("injected dll with pid %1 sent initial info").arg(c->GetInfo().PID));
+                }
                 InjectedPIDs.insert(uint64_t(c->GetInfo().PID));
             }
+        } else {
+            WriteLog(LL_Info, QString("injected dll with pid %1 disconnected").arg(c->GetInfo().PID));
         }
     }
     Connections.swap(newConnections);
@@ -308,6 +318,7 @@ void TScreenShotMaker::CheckFailedScreens() {
     if (!anyInProgress) {
         MakingScreen = false;
         TimeoutTimer.stop();
+        WriteLog(LL_Warning, "failed to make screenshot: injected dll was unable to make screenshot");
         emit OnFailed();
     }
 }
